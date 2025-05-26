@@ -4,6 +4,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"go-vmu/internal/config"
 	"go-vmu/internal/logger"
+	"go-vmu/internal/metadata"
 	"go-vmu/internal/nfo"
 )
 
@@ -27,8 +28,13 @@ func main() {
 	if err != nil {
 		log.Error().Err(err).Msg("Error parsing NFO file")
 	}
-	log.Info().Msgf("NFO path: %s\n", nfoPath)
-	log.Info().Msgf("NFO: %v\n", data)
-	log.Info().Msgf("Episode Title: %s\n", data.Title)
+
+	adapter := metadata.NewNFOAdapter(data)
+	meta, err := adapter.TranslateNFO()
+	if err != nil {
+		log.Error().Err(err).Msg("Error translating NFO file")
+	}
+	log.Info().Msgf("\nNFO:\n%v\n", data)
+	log.Info().Msgf("\nMetadata:\n%v\n", meta)
 
 }
