@@ -1,0 +1,21 @@
+nfo_type = "jellyfin"
+scan_folder = "/my/media/library"
+
+[logger]
+# GOVMU_LOGGER_LEVEL
+level = "debug"
+# GOVMU_LOGGER_PRETTY
+pretty = true
+# GOVMU_LOGGER_TIME_FORMAT
+time_format = 1979-05-27T07:32:00
+# GOVMU_LOGGER_LOG_FILE
+log_file = "./vmu.log"
+# GOVMU_LOGGER_MAX_SIZE
+max_size = 4
+# GOVMU_LOGGER_MAX_AGE
+max_age = 14
+# GOVMU_LOGGER_MAX_BACKUPS
+max_backups = 10
+# GOVMU_LOGGER_COMPRESS_BACKUP
+compress_backup = false
+
