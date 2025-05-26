@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/rs/zerolog/log"
 	"go-vmu/internal/config"
+	"go-vmu/internal/ffmpeg"
 	"go-vmu/internal/logger"
 	"go-vmu/internal/metadata"
 	"go-vmu/internal/nfo"
@@ -19,6 +20,7 @@ func main() {
 	log.Info().Msgf("Config: %v", cfg)
 
 	testPath := "/mnt/eagle5/videos/Tv/Westworld/Season 1/Westworld - S01E01 - The Original Bluray-1080p.mkv"
+	testNewPath := "/mnt/eagle5/videos/Tv/Westworld/Season 1/Westworld - S01E01 - The Original Bluray-1080p-tmp.mkv"
 
 	nfoPath, err := nfo.MatchEpisodeFile(testPath)
 	if err != nil {
@@ -36,5 +38,12 @@ func main() {
 	}
 	log.Info().Msgf("\nNFO:\n%v\n", data)
 	log.Info().Msgf("\nMetadata:\n%v\n", meta)
+
+	cmd, err := ffmpeg.NewFFmpegCommand().WithInput(testPath).WithOutput(testNewPath).WithMetadata(*meta)
+	if err != nil {
+		log.Error().Err(err).Msg("Error creating ffmpeg command")
+	}
+	args := cmd.Build()
+	log.Info().Msgf("FFmpeg command: %v", args)
 
 }
