@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/rs/zerolog/log"
 	"go-vmu/internal/nfo"
+	"strings"
 )
 
 type NFOAdapter struct {
@@ -24,12 +25,21 @@ func (a *NFOAdapter) TranslateNFO() (*Metadata, error) {
 		return nil, fmt.Errorf("NFO details not set")
 	}
 
-	var actors []string
+	//convert to strings
+
+	var actorsNames []string
 
 	for _, actor := range a.Details.Actor {
-		log.Debug().Msgf("Actor: %s", actor)
-		actors = append(actors, actor.Name)
+		log.Debug().Msgf("Actor: %v", actor)
+		actorsNames = append(actorsNames, actor.Name)
 	}
+
+	actors := strings.Join(actorsNames, ", ")
+	log.Debug().Msgf("Actors: %s", actors)
+	genres := strings.Join(a.Details.Genre, ", ")
+	log.Debug().Msgf("Genres: %s", genres)
+	directors := strings.Join(a.Details.Director, ", ")
+	log.Debug().Msgf("Directors: %s", directors)
 
 	a.Metadata.Title = a.Details.Title
 	log.Debug().Msgf("Title: %s", a.Metadata.Title)
@@ -43,7 +53,7 @@ func (a *NFOAdapter) TranslateNFO() (*Metadata, error) {
 	log.Debug().Msgf("Season: %d", a.Metadata.Season)
 	a.Metadata.Episode = a.Details.Episode
 	log.Debug().Msgf("Episode: %d", a.Metadata.Episode)
-	a.Metadata.Genres = a.Details.Genre
+	a.Metadata.Genres = genres
 	log.Debug().Msgf("Genres: %v", a.Metadata.Genres)
 	a.Metadata.IMDBID = a.Details.IMDBID
 	log.Debug().Msgf("IMDBID: %s", a.Metadata.IMDBID)
@@ -55,10 +65,10 @@ func (a *NFOAdapter) TranslateNFO() (*Metadata, error) {
 	log.Debug().Msgf("Writer: %s", a.Metadata.Writer)
 	a.Metadata.Credits = a.Details.Credits
 	log.Debug().Msgf("Credits: %s", a.Metadata.Credits)
-	a.Metadata.Directors = a.Details.Director
+	a.Metadata.Directors = directors
 	log.Debug().Msgf("Directors: %v", a.Metadata.Directors)
 	a.Metadata.Actors = actors
-	log.Debug().Msgf("Actors: %v", actors)
+	log.Debug().Msgf("Actors: %v", a.Metadata.Actors)
 
 	return a.Metadata, nil
 }

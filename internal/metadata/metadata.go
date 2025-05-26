@@ -9,15 +9,18 @@ type Metadata struct {
 	ShowTitle string
 	Season    int
 	Episode   int
-	Genres    []string
-	IMDBID    string
-	TVDBID    string
-	Year      int
-	Writer    string
-	Credits   string
-	Directors []string
+	//parse array to comma sep string
+	Genres  string
+	IMDBID  string
+	TVDBID  string
+	Year    int
+	Writer  string
+	Credits string
+	//parse array to comma sep string
+	Directors string
 	//Will need to process this from actor structs - only need names
-	Actors []string
+	//to parse an array to comma sep string
+	Actors string
 }
 
 func NewMetadata() *Metadata {
@@ -25,8 +28,8 @@ func NewMetadata() *Metadata {
 }
 
 func (m *Metadata) ToMap() (map[string]interface{}, error) {
-	//We need this lil guy
-	var metaFields map[string]interface{}
+	//We need this lil guy so we don't assign to a nil map
+	metaFields := make(map[string]interface{})
 
 	// do nothing if metadata is nil
 	if m == nil {
@@ -52,7 +55,7 @@ func (m *Metadata) ToMap() (map[string]interface{}, error) {
 	if m.Episode != 0 {
 		metaFields["episode"] = m.Episode
 	}
-	if m.Genres != nil {
+	if m.Genres != "" {
 		metaFields["genre"] = m.Genres
 	}
 	if m.IMDBID != "" {
@@ -70,10 +73,10 @@ func (m *Metadata) ToMap() (map[string]interface{}, error) {
 	if m.Credits != "" {
 		metaFields["credits"] = m.Credits
 	}
-	if m.Directors != nil {
+	if m.Directors != "" {
 		metaFields["director"] = m.Directors
 	}
-	if m.Actors != nil {
+	if m.Actors != "" {
 		metaFields["actor"] = m.Actors
 	}
 	//return the map

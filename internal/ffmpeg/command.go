@@ -36,6 +36,7 @@ func (cmd *FFmpegCommand) WithOutput(output string) *FFmpegCommand {
 }
 
 func (cmd *FFmpegCommand) WithMetadata(meta metadata.Metadata) (*FFmpegCommand, error) {
+
 	metaFields, err := meta.ToMap()
 
 	if err != nil {
