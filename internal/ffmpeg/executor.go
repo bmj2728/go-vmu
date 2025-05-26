@@ -10,6 +10,7 @@ import (
 
 type Executor struct {
 	Command *FFmpegCommand
+	backup  string
 }
 
 func NewExecutor(cmd *FFmpegCommand) *Executor {
@@ -25,19 +26,19 @@ func (e *Executor) Execute() error {
 		return err
 	}
 
-	err = e.copyFile()
+	err = e.backupFile()
 	if err != nil {
 		log.Error().Err(err).Msg("Error copying file")
 		return err
 	}
 
-	argString, err := e.Command.GenerateArgs().ArgsString()
+	argString, err := e.Command.ArgsString()
 	if err != nil {
 		log.Error().Err(err).Msg("Error generating args")
 		return err
 	}
 
-	command := exec.Command("update metadata", argString)
+	command := exec.Command("ffmpeg", argString)
 	err = command.Run()
 	if err != nil {
 		log.Error().Err(err).Msg("Error running command")
@@ -63,7 +64,7 @@ func (e *Executor) validArgs() (bool, error) {
 	return true, nil
 }
 
-func (e *Executor) copyFile() error {
+func (e *Executor) backupFile() error {
 	newPath := "temp-" + e.Command.inputFile
 
 	// Open the source file for reading
@@ -84,6 +85,8 @@ func (e *Executor) copyFile() error {
 	if _, err := io.Copy(destFile, sourceFile); err != nil {
 		return fmt.Errorf("error copying file: %w", err)
 	}
+
+	e.backup = newPath
 
 	return nil
 }
