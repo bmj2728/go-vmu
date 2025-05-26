@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"github.com/rs/zerolog/log"
 	"go-vmu/internal/metadata"
+	"strings"
 )
 
 type FFmpegCommand struct {
 	inputFile  string
 	outputFile string
 	metadata   map[string]interface{}
+	args       []string
 	// Other options if we need them
 }
 
@@ -23,6 +25,7 @@ func (cmd *FFmpegCommand) WithInput(input string) *FFmpegCommand {
 		inputFile:  input,
 		outputFile: cmd.outputFile,
 		metadata:   cmd.metadata,
+		args:       cmd.args,
 	}
 }
 
@@ -32,6 +35,7 @@ func (cmd *FFmpegCommand) WithOutput(output string) *FFmpegCommand {
 		inputFile:  cmd.inputFile,
 		outputFile: output,
 		metadata:   cmd.metadata,
+		args:       cmd.args,
 	}
 }
 
@@ -48,10 +52,11 @@ func (cmd *FFmpegCommand) WithMetadata(meta metadata.Metadata) (*FFmpegCommand, 
 		inputFile:  cmd.inputFile,
 		outputFile: cmd.outputFile,
 		metadata:   metaFields,
+		args:       cmd.args,
 	}, nil
 }
 
-func (cmd *FFmpegCommand) Build() []string {
+func (cmd *FFmpegCommand) GenerateArgs() *FFmpegCommand {
 	args := []string{"-i", cmd.inputFile, "-c", "copy"}
 
 	for key, value := range cmd.metadata {
@@ -59,5 +64,22 @@ func (cmd *FFmpegCommand) Build() []string {
 	}
 
 	args = append(args, cmd.outputFile)
-	return args
+
+	return &FFmpegCommand{
+		inputFile:  cmd.inputFile,
+		outputFile: cmd.outputFile,
+		metadata:   cmd.metadata,
+		args:       args,
+	}
+}
+
+func (cmd *FFmpegCommand) ArgsString() (string, error) {
+
+	if cmd.args == nil {
+		return "", fmt.Errorf("args is nil")
+	}
+
+	argString := strings.Join(cmd.args, " ")
+
+	return argString, nil
 }

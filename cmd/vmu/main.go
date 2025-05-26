@@ -43,7 +43,10 @@ func main() {
 	if err != nil {
 		log.Error().Err(err).Msg("Error creating ffmpeg command")
 	}
-	args := cmd.Build()
+	args := cmd.GenerateArgs()
 	log.Info().Msgf("FFmpeg command: %v", args)
+
+	//validate args
+	//run command
 
 }
