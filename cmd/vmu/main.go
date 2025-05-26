@@ -20,7 +20,7 @@ func main() {
 	log.Info().Msgf("Config: %v", cfg)
 
 	testPath := "/mnt/eagle5/videos/Tv/Westworld/Season 1/Westworld - S01E01 - The Original Bluray-1080p.mkv"
-	testNewPath := "/mnt/eagle5/videos/Tv/Westworld/Season 1/Westworld - S01E01 - The Original Bluray-1080p-tmp.mkv"
+	testNewPath := testPath + " - govmu-edit.mkv"
 
 	nfoPath, err := nfo.MatchEpisodeFile(testPath)
 	if err != nil {
@@ -43,10 +43,29 @@ func main() {
 	if err != nil {
 		log.Error().Err(err).Msg("Error creating ffmpeg command")
 	}
-	args := cmd.GenerateArgs()
-	log.Info().Msgf("FFmpeg command: %v", args)
+	cmd = cmd.GenerateArgs()
+	log.Info().Msgf("FFmpeg command: %v", cmd)
 
-	//validate args
-	//run command
+	executor := ffmpeg.NewExecutor(cmd)
+
+	err = executor.Execute()
+	if err != nil {
+		log.Error().Err(err).Msg("Error executing ffmpeg command")
+		return
+	}
+	ok, err := executor.ValidateNewFile()
+	if err != nil {
+		log.Error().Err(err).Msg("Error validating new file")
+		return
+	}
+	if !ok {
+		log.Error().Msg("New file is invalid")
+		return
+	}
+	err = executor.Cleanup()
+	if err != nil {
+		log.Error().Err(err).Msg("Error cleaning up")
+		return
+	}
 
 }
