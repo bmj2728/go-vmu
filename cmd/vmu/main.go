@@ -9,10 +9,12 @@ import (
 	"go-vmu/internal/nfo"
 )
 
-//TODO - status - kinda works! I'm able to locally process a file - nfs share was an issue
+//TODO - status - kinda works! I'm able to locally process a file - nfs share is an issue
 // what doesn't work right:
 // - nfs share
-// - cleanup - backup not deleted, new file not replacing original file
+// need:
+// - a slice of files to process or a file walk
+// - concurrency, even just updating metadata takes a few seconds say 3 * 4000 = 12000 secs = 3.3333 hours
 
 func main() {
 	cfg, err := config.Load("././config.toml")

@@ -58,7 +58,7 @@ func (cmd *FFmpegCommand) GenerateArgs() *FFmpegCommand {
 	args := []string{"-i", cmd.inputFile, "-c", "copy"}
 
 	for key, value := range cmd.metadata {
-		args = append(args, "-metadata", fmt.Sprintf("%s=%s", key, value))
+		args = append(args, "-metadata", fmt.Sprintf("%s=%v", key, value))
 	}
 
 	args = append(args, cmd.outputFile)
