@@ -8,6 +8,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 )
 
@@ -145,7 +146,7 @@ func (e *Executor) validArgs() (bool, error) {
 	}
 
 	//check for dangerous characters and commands - we can probs do better
-	dangerousChars := []string{"|", ";", "&&", ">", "<", "`", "$", "(", ")"}
+	dangerousChars := []string{"&&", "rm -Rf"}
 	for _, char := range dangerousChars {
 		if strings.Contains(argsString, char) {
 			return false, fmt.Errorf("dangerous character detected in arguments: %s", char)
@@ -175,7 +176,12 @@ func (e *Executor) validArgs() (bool, error) {
 }
 
 func (e *Executor) backupFile() error {
-	newPath := "temp-" + e.Command.inputFile
+	newPath := e.Command.inputFile + ".backup"
+
+	dir := filepath.Dir(e.Command.inputFile)
+	file := strings.Split(filepath.Base(e.Command.inputFile), ".")[0]
+	ext := strings.Split(filepath.Base(e.Command.inputFile), ".")[1]
+	newPath = dir + "/" + file + ".backup." + ext
 
 	// Open the source file for reading
 	sourceFile, err := os.Open(e.Command.inputFile)
