@@ -92,21 +92,21 @@ func (e *Executor) ValidateNewFile() (bool, error) {
 
 func (e *Executor) Cleanup() error {
 
-	//open source file output
+	// open source file for reading
 	sourceFile, err := os.Open(e.Command.outputFile)
 	if err != nil {
 		return fmt.Errorf("failed to open source file: %w", err)
 	}
 	defer closeFile(sourceFile, "source")
 
-	//open the destination file for writing
-	destFile, err := os.Open(e.Command.inputFile)
+	// open the destination file for writing
+	destFile, err := os.OpenFile(e.Command.inputFile, os.O_WRONLY|os.O_TRUNC, 0644)
 	if err != nil {
 		return fmt.Errorf("failed to open destination file: %w", err)
 	}
 	defer closeFile(destFile, "destination")
 
-	//copy data from source to destination
+	// copy data from source to destination
 	if _, err := io.Copy(destFile, sourceFile); err != nil {
 		return fmt.Errorf("error copying file: %w", err)
 	}
@@ -118,14 +118,14 @@ func (e *Executor) Cleanup() error {
 		return err
 	}
 
-	//remove the new file
+	// remove the new file
 	err = e.removeOutputFile()
 	if err != nil {
 		log.Error().Err(err).Msg("Error removing output file")
 		return err
 	}
 
-	//reset the backup
+	// reset the backup path
 	e.backup = ""
 
 	return nil
@@ -241,7 +241,7 @@ func (e *Executor) revertToBackup() error {
 	defer closeFile(sourceFile, "source")
 
 	// open the destination file for writing
-	destFile, err := os.Open(e.Command.inputFile)
+	destFile, err := os.OpenFile(e.Command.inputFile, os.O_WRONLY|os.O_TRUNC, 0644)
 	if err != nil {
 		return fmt.Errorf("failed to open destination file: %w", err)
 	}

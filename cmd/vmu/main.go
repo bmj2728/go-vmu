@@ -9,6 +9,11 @@ import (
 	"go-vmu/internal/nfo"
 )
 
+//TODO - status - kinda works! I'm able to locally process a file - nfs share was an issue
+// what doesn't work right:
+// - nfs share
+// - cleanup - backup not deleted, new file not replacing original file
+
 func main() {
 	cfg, err := config.Load("././config.toml")
 	if err != nil {
@@ -19,8 +24,8 @@ func main() {
 	log.Info().Str("startup", "logger").Msg("Logger started")
 	log.Info().Msgf("Config: %v", cfg)
 
-	testPath := "/mnt/eagle5/videos/Tv/Westworld/Season 1/Westworld - S01E01 - The Original Bluray-1080p.mkv"
-	testNewPath := testPath + " - govmu-edit.mkv"
+	testPath := "/home/brian/test/Westworld - S01E01 - The Original Bluray-1080p.mkv"
+	testNewPath := testPath + ".govmu-edit.mkv"
 
 	nfoPath, err := nfo.MatchEpisodeFile(testPath)
 	if err != nil {
