@@ -1,6 +1,7 @@
 package ffmpeg
 
 import (
+	"errors"
 	"fmt"
 	"github.com/rs/zerolog/log"
 	"go-vmu/internal/validator"
@@ -17,7 +18,7 @@ type Executor struct {
 }
 
 func NewExecutor(cmd *FFmpegCommand) *Executor {
-	newValidator := validator.NewValidator(cmd.inputFile, cmd.outputFile)
+	newValidator := validator.NewValidator(cmd.inputFile, cmd.outputFile, 10)
 	return &Executor{
 		Command:   cmd,
 		Validator: newValidator,
@@ -49,17 +50,17 @@ func (e *Executor) Execute() error {
 		clErr := e.revertToBackup()
 		if clErr != nil {
 			log.Error().Err(clErr).Msg("Error cleaning up")
-			return clErr
+			return errors.Join(err, clErr)
 		}
 		clErr = e.removeOutputFile()
 		if clErr != nil {
 			log.Error().Err(clErr).Msg("Error cleaning up")
-			return clErr
+			return errors.Join(err, clErr)
 		}
 		clErr = e.removeBackupFile()
 		if clErr != nil {
 			log.Error().Err(clErr).Msg("Error cleaning up")
-			return clErr
+			return errors.Join(err, clErr)
 		}
 		return err
 	}
@@ -83,7 +84,7 @@ func (e *Executor) ValidateNewFile() (bool, error) {
 		if clErr != nil {
 			log.Error().Err(clErr).Msg("Error cleaning up")
 		}
-		return false, clErr
+		return false, errors.Join(err, clErr)
 	}
 	return true, nil
 }

@@ -3,6 +3,7 @@ package validator
 import (
 	"fmt"
 	"github.com/rs/zerolog/log"
+	"time"
 )
 
 type Validator struct {
@@ -12,9 +13,9 @@ type Validator struct {
 	newProber *MediaProber
 }
 
-func NewValidator(old string, new string) *Validator {
-	oldProber := NewMediaProber(10)
-	newProber := NewMediaProber(10)
+func NewValidator(old string, new string, timeout time.Duration) *Validator {
+	oldProber := NewMediaProber(timeout)
+	newProber := NewMediaProber(timeout)
 	return &Validator{
 		old:       old,
 		new:       new,

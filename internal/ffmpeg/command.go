@@ -20,7 +20,6 @@ func NewFFmpegCommand() *FFmpegCommand {
 }
 
 func (cmd *FFmpegCommand) WithInput(input string) *FFmpegCommand {
-	cmd.inputFile = input
 	return &FFmpegCommand{
 		inputFile:  input,
 		outputFile: cmd.outputFile,
@@ -30,7 +29,6 @@ func (cmd *FFmpegCommand) WithInput(input string) *FFmpegCommand {
 }
 
 func (cmd *FFmpegCommand) WithOutput(output string) *FFmpegCommand {
-	cmd.outputFile = output
 	return &FFmpegCommand{
 		inputFile:  cmd.inputFile,
 		outputFile: output,
