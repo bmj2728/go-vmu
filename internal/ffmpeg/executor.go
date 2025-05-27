@@ -4,11 +4,11 @@ import (
 	"errors"
 	"fmt"
 	"github.com/rs/zerolog/log"
+	"go-vmu/internal/utils"
 	"go-vmu/internal/validator"
 	"io"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"strings"
 )
 
@@ -176,12 +176,8 @@ func (e *Executor) validArgs() (bool, error) {
 }
 
 func (e *Executor) backupFile() error {
-	newPath := e.Command.inputFile + ".backup"
 
-	dir := filepath.Dir(e.Command.inputFile)
-	file := strings.Split(filepath.Base(e.Command.inputFile), ".")[0]
-	ext := strings.Split(filepath.Base(e.Command.inputFile), ".")[1]
-	newPath = dir + "/" + file + ".backup." + ext
+	newPath := utils.InsertTagToFileName(e.Command.inputFile, "backup")
 
 	// Open the source file for reading
 	sourceFile, err := os.Open(e.Command.inputFile)

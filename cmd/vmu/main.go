@@ -7,6 +7,7 @@ import (
 	"go-vmu/internal/logger"
 	"go-vmu/internal/metadata"
 	"go-vmu/internal/nfo"
+	"go-vmu/internal/utils"
 )
 
 //TODO - status - kinda works! I'm able to locally process a file - nfs share is an issue
@@ -27,7 +28,7 @@ func main() {
 	log.Info().Msgf("Config: %v", cfg)
 
 	testPath := "/home/brian/test/Westworld - S01E01 - The Original Bluray-1080p.mkv"
-	testNewPath := testPath + ".govmu-edit.mkv"
+	testNewPath := utils.InsertTagToFileName(testPath, ".govmu-edit.")
 
 	nfoPath, err := nfo.MatchEpisodeFile(testPath)
 	if err != nil {

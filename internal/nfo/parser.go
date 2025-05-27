@@ -4,9 +4,8 @@ import (
 	"encoding/xml"
 	"fmt"
 	"github.com/rs/zerolog/log"
+	"go-vmu/internal/utils"
 	"os"
-	"path/filepath"
-	"strings"
 )
 
 // NFONotFoundError represents an error message when an NFO file cannot be located.
@@ -55,15 +54,17 @@ func MatchEpisodeFile(path string) (string, error) {
 		log.Error().Err(err).Msg(NFONotFoundError)
 		return "", fmt.Errorf(NFONotFoundError+": %v", err)
 	}
-	//get working directory + name
-	wd := filepath.Dir(path)
-	base := strings.Split(filepath.Base(path), ".")[0]
-	nfoPath := wd + "/" + base + ".nfo"
-	log.Debug().Strs("nfo", []string{path, "working directory " + wd, "base " + base, "expected " + nfoPath}).Msg("Working directory")
-	//Test our guess
-	if _, err := os.Stat(nfoPath); os.IsNotExist(err) {
-		log.Error().Err(err).Msg(NFONotFoundError)
-		return "", fmt.Errorf(NFONotFoundError+": %v", err)
-	}
-	return nfoPath, nil
+	//get working directory
+	/*old
+	//wd := filepath.Dir(path)
+	//base := strings.Split(filepath.Base(path), ".")[0]
+	//nfoPath := wd + "/" + base + ".nfo"
+	//log.Debug().Strs("nfo", []string{path, "working directory " + wd, "base " + base, "expected " + nfoPath}).Msg("Working directory")
+	////Test our guess
+	//if _, err := os.Stat(nfoPath); os.IsNotExist(err) {
+	//	log.Error().Err(err).Msg(NFONotFoundError)
+	//	return "", fmt.Errorf(NFONotFoundError+": %v", err)
+	//}
+	*/
+	return utils.NFOPath(path)
 }
