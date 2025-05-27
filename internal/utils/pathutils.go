@@ -14,7 +14,7 @@ func InsertTagToFileName(path string, tag string) string {
 	dir, file := filepath.Split(path)
 	ext := filepath.Ext(path)
 	name := strings.Replace(file, "."+ext, "", 1)
-	newPath := dir + "/" + name + "." + tag + "." + ext
+	newPath := dir + name + "." + tag + "." + ext
 	return newPath
 }
 
@@ -25,7 +25,7 @@ func NFOPath(path string) (string, error) {
 	dir, file := filepath.Split(path)
 	ext := filepath.Ext(path)
 	name := strings.Replace(file, "."+ext, "", 1)
-	nfoPath := dir + "/" + name + ".nfo"
+	nfoPath := dir + name + ".nfo"
 	ok, err := os.Stat(nfoPath)
 	if err != nil && !os.IsNotExist(err) {
 		return "", fmt.Errorf("error checking if %s exists: %v", nfoPath, err)
