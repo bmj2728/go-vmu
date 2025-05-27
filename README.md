@@ -74,6 +74,18 @@ go run cmd/vmu/main.go
 
 After processing, FFprobe will show the embedded metadata tags in your video files:
 
+### Before
+```json
+{
+  "tags": {
+    "encoder": "libebml v1.3.5 + libmatroska v1.4.8",
+    "creation_time": "2020-03-04T08:14:33.000000Z",
+    "Writing frontend": "StaxRip v1.7.0.6"
+  }
+}
+```
+
+### After
 ```json
 {
   "tags": {
