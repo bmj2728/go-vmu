@@ -5,6 +5,7 @@ import "time"
 type Config struct {
 	NFOType    string       `toml:"nfo_type"`
 	ScanFolder string       `toml:"scan_folder"`
+	Workers    int          `toml:"workers"`
 	Logger     LoggerConfig `toml:"logger"`
 }
 

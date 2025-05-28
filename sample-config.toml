@@ -1,5 +1,6 @@
 nfo_type = "jellyfin"
 scan_folder = "/my/media/library"
+workers = 10
 
 [logger]
 # GOVMU_LOGGER_LEVEL
