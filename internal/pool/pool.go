@@ -66,18 +66,15 @@ func (p *Pool) Stop() {
 }
 
 func (p *Pool) GenerateJobs(root string) error {
-	//initial buffer size
-	bufferSize := p.Workers * 2
-
+	// First, walk the directory to count files and collect paths
 	var paths []string
 
-	//helper function
-	getFiles := func(path string, info os.FileInfo, err error) error {
-
+	// Helper function to collect paths
+	collectFiles := func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		} else if info.IsDir() {
-			return err
+			return nil
 		} else if strings.HasSuffix(info.Name(), ".avi") ||
 			strings.HasSuffix(info.Name(), ".mp4") ||
 			strings.HasSuffix(info.Name(), ".mkv") ||
@@ -87,29 +84,29 @@ func (p *Pool) GenerateJobs(root string) error {
 			strings.HasSuffix(info.Name(), ".flv") ||
 			strings.HasSuffix(info.Name(), ".m4v") {
 			paths = append(paths, path)
+			log.Debug().Msgf("Found file: %s", path)
 		}
-
 		return nil
 	}
 
-	bufferSize = bufferSize + len(paths)
-
-	p.Jobs = make(chan string, bufferSize)
-
-	for _, path := range paths {
-		p.Submit(path)
-	}
-
-	log.Debug().Msgf("Getting files from %s", root)
-	//walk the directory
-	err := filepath.Walk(root, getFiles)
-	//handle errors
+	log.Debug().Msgf("Collecting files from %s", root)
+	// Walk the directory to collect paths
+	err := filepath.Walk(root, collectFiles)
 	if err != nil {
 		log.Error().Err(err).Msg("Error walking directory")
 		return err
 	}
 
-	log.Debug().Msgf("Finished walking directory")
+	// Now create the channel with appropriate buffer size
+	bufferSize := len(paths) // Use actual file count for buffer
+	log.Debug().Msgf("Creating job channel with buffer size %d for %d files", bufferSize, len(paths))
+	p.Jobs = make(chan string, bufferSize)
 
+	// Submit all jobs
+	for _, path := range paths {
+		p.Submit(path)
+	}
+
+	log.Debug().Msgf("Submitted %d jobs", len(paths))
 	return nil
 }
