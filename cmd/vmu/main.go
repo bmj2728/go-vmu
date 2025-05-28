@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/rs/zerolog/log"
 	"go-vmu/internal/config"
 	"go-vmu/internal/ffmpeg"
@@ -20,7 +21,7 @@ import (
 func main() {
 	cfg, err := config.Load("././config.toml")
 	if err != nil {
-		panic(err)
+		fmt.Printf("Error loading config: %v\n", err)
 	}
 	logger.Setup(&cfg.Logger)
 
