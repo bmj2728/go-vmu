@@ -42,11 +42,10 @@ func (w *Worker) Start() {
 		case filePath, ok := <-w.Jobs:
 			if !ok {
 				// Channel closed, no more jobs
-				log.Debug().Msg("Channel closed, no more jobs")
+				log.Debug().Msgf("Worker %d finished. Channel closed & no more jobs", w.Id)
 				return
 			}
 			result := w.processFile(filePath)
-			log.Debug().Msgf("Worker %d processed file: %s: %v", w.Id, filePath, result)
 			w.Results <- result
 			log.Debug().Msgf("Result sent to channel. Completed files: %d", len(w.Results))
 
