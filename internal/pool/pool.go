@@ -23,8 +23,8 @@ type Pool struct {
 func NewPool(workerCount int) *Pool {
 	ctx, cancel := context.WithCancel(context.Background())
 	return &Pool{
-		Workers:    workerCount,
-		Jobs:       make(chan string, workerCount*2), // Buffer for efficiency
+		Workers: workerCount,
+		//Jobs:       make(chan string, workerCount*2), // Buffer for efficiency
 		Results:    make(chan *ProcessResult),
 		Ctx:        ctx,
 		CancelFunc: cancel,
@@ -35,6 +35,7 @@ func NewPool(workerCount int) *Pool {
 func (p *Pool) Start() {
 	for i := 0; i < p.Workers; i++ {
 		worker := NewWorker(i, p.Jobs, p.Results, &p.Wg, p.Ctx)
+		log.Debug().Msgf("Starting worker %d", i)
 		p.Wg.Add(1)
 		go worker.Start()
 	}
@@ -42,6 +43,7 @@ func (p *Pool) Start() {
 
 // Submit adds a job to the pool
 func (p *Pool) Submit(filePath string) {
+	log.Debug().Msgf("Submitting job for %s", filePath)
 	p.Jobs <- filePath
 }
 
@@ -63,7 +65,11 @@ func (p *Pool) Stop() {
 	p.CancelFunc()
 }
 
-func (p *Pool) GetJobs(root string) error {
+func (p *Pool) GenerateJobs(root string) error {
+	//initial buffer size
+	bufferSize := p.Workers * 2
+
+	var paths []string
 
 	//helper function
 	getFiles := func(path string, info os.FileInfo, err error) error {
@@ -80,20 +86,30 @@ func (p *Pool) GetJobs(root string) error {
 			strings.HasSuffix(info.Name(), ".wmv") ||
 			strings.HasSuffix(info.Name(), ".flv") ||
 			strings.HasSuffix(info.Name(), ".m4v") {
-			p.Submit(path)
+			paths = append(paths, path)
 		}
 
 		return nil
 	}
 
+	bufferSize = bufferSize + len(paths)
+
+	p.Jobs = make(chan string, bufferSize)
+
+	for _, path := range paths {
+		p.Submit(path)
+	}
+
+	log.Debug().Msgf("Getting files from %s", root)
 	//walk the directory
 	err := filepath.Walk(root, getFiles)
-
 	//handle errors
 	if err != nil {
 		log.Error().Err(err).Msg("Error walking directory")
 		return err
 	}
+
+	log.Debug().Msgf("Finished walking directory")
 
 	return nil
 }

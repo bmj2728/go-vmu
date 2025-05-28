@@ -21,18 +21,23 @@ func main() {
 	// setup logger
 	logger.Setup(&cfg.Logger)
 
-	log.Info().Str("startup", "logger").Msg("Logger started")
-	log.Info().Msgf("Config: %v", cfg)
+	log.Debug().Str("startup", "logger").Msg("Logger started")
+	log.Debug().Msgf("Config: %v", cfg)
 
 	// create pool
+	log.Debug().Msg("Creating pool")
 	workers := pool.NewPool(cfg.Workers)
+	log.Debug().Msg("Pool created")
 	// get files to process
-	err = workers.GetJobs(cfg.ScanFolder)
+	log.Debug().Msg("Getting jobs")
+	err = workers.GenerateJobs(cfg.ScanFolder)
 	if err != nil {
 		log.Error().Err(err).Msg("Error getting jobs")
 		return
 	}
+	log.Debug().Msg("Jobs retrieved")
 	// start workers
+	log.Debug().Msg("Starting workers")
 	workers.Start()
 	// wait for all workers to finish
 	results := workers.Wait()
