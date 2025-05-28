@@ -108,7 +108,7 @@ func (w *Worker) processFile(filePath string) *ProcessResult {
 		success = false
 		return result.WithResult(success, err)
 	}
-	cmd.GenerateArgs()
+	cmd = cmd.GenerateArgs()
 	log.Debug().Msgf("FFmpeg command: %v", cmd)
 
 	//create executor
