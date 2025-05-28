@@ -28,6 +28,7 @@ func NewExecutor(cmd *FFmpegCommand) *Executor {
 
 func (e *Executor) Execute() error {
 	//validate args
+	log.Debug().Msgf("Validating args: %v", e.Command.args)
 	ok, err := e.validArgs()
 	if !ok || err != nil {
 		log.Error().Err(err).Msg("Invalid arguments")
@@ -35,15 +36,17 @@ func (e *Executor) Execute() error {
 	}
 
 	//backup the file
+	log.Debug().Msg("Backing up file")
 	err = e.backupFile()
 	if err != nil {
 		log.Error().Err(err).Msg("Error copying file")
 		return err
 	}
+	log.Debug().Msgf("File backed up to %s", e.backup)
 
 	//execute the command
 	command := exec.Command("ffmpeg", e.Command.args...)
-	log.Info().Msgf("Executing command: %v", command.Args)
+	log.Debug().Msgf("Executing command: %v", command.Args)
 	err = command.Run()
 	if err != nil {
 		log.Error().Err(err).Msg("Error running command")
@@ -65,6 +68,8 @@ func (e *Executor) Execute() error {
 		}
 		return err
 	}
+	//everything went well
+	log.Debug().Msg("Command executed successfully")
 	return nil
 }
 
