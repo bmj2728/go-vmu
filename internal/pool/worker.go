@@ -42,16 +42,22 @@ func (w *Worker) Start() {
 		case filePath, ok := <-w.Jobs:
 			if !ok {
 				// Channel closed, no more jobs
+				log.Debug().Msg("Channel closed, no more jobs")
 				return
 			}
 			result := w.processFile(filePath)
+			log.Debug().Msgf("Worker %d processed file: %s: %v", w.Id, filePath, result)
 			w.Results <- result
+			log.Debug().Msgf("Result sent to channel. Completed files: %d", len(w.Results))
 
 		case <-w.Ctx.Done():
 			// Context cancelled, stop worker
+			log.Debug().Msg("Context cancelled, stopping worker")
 			return
 		}
+		log.Debug().Msg("Worker finished loop?")
 	}
+
 }
 
 // processFile handles the actual file processing
@@ -143,6 +149,9 @@ func (w *Worker) processFile(filePath string) *ProcessResult {
 		return result.WithResult(success, err)
 	}
 
+	success = true
+
+	log.Debug().Msgf("Worker %d processed file successfully: %s", w.Id, filePath)
 	//share results
 	return result.WithResult(success, err)
 }

@@ -25,7 +25,7 @@ func NewPool(workerCount int) *Pool {
 	return &Pool{
 		Workers: workerCount,
 		//Jobs:       make(chan string, workerCount*2), // Buffer for efficiency
-		Results:    make(chan *ProcessResult),
+		//Results:    make(chan *ProcessResult), //this also needs to be bufferred
 		Ctx:        ctx,
 		CancelFunc: cancel,
 	}
@@ -101,6 +101,7 @@ func (p *Pool) GenerateJobs(root string) error {
 	bufferSize := len(paths) // Use actual file count for buffer
 	log.Debug().Msgf("Creating job channel with buffer size %d for %d files", bufferSize, len(paths))
 	p.Jobs = make(chan string, bufferSize)
+	p.Results = make(chan *ProcessResult, bufferSize)
 
 	// Submit all jobs
 	for _, path := range paths {
