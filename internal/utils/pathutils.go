@@ -14,7 +14,7 @@ func InsertTagToFileName(path string, tag string) string {
 	dir, file := filepath.Split(path)
 	ext := filepath.Ext(path)
 	name := strings.Replace(file, ext, "", 1)
-	newPath := dir + name + "." + tag + "." + ext
+	newPath := dir + name + "." + tag + ext
 	return newPath
 }
 
