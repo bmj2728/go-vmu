@@ -65,8 +65,6 @@ func (p *Pool) Stop() {
 
 func (p *Pool) GetJobs(root string) error {
 
-	var files []string
-
 	//helper function
 	getFiles := func(path string, info os.FileInfo, err error) error {
 
@@ -82,22 +80,19 @@ func (p *Pool) GetJobs(root string) error {
 			strings.HasSuffix(info.Name(), ".wmv") ||
 			strings.HasSuffix(info.Name(), ".flv") ||
 			strings.HasSuffix(info.Name(), ".m4v") {
-			files = append(files, path)
+			p.Submit(path)
 		}
 
 		return nil
 	}
 
+	//walk the directory
 	err := filepath.Walk(root, getFiles)
 
+	//handle errors
 	if err != nil {
 		log.Error().Err(err).Msg("Error walking directory")
 		return err
-	}
-
-	for _, file := range files {
-		log.Debug().Msgf("Adding file to pool: %s", file)
-		p.Submit(file)
 	}
 
 	return nil
