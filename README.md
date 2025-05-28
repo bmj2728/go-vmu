@@ -38,6 +38,7 @@ Create a `config.toml` file in the application directory or use the provided `sa
 ```toml
 nfo_type = "jellyfin"
 scan_folder = "/path/to/your/media/library"
+workers = 4           # Number of concurrent worker threads
 
 [logger]
 level = "info"        # debug, info, warn, error
@@ -52,23 +53,27 @@ compress_backup = false
 
 ## Usage
 
-Currently, the application is in development and the main.go file contains an example implementation. To use the application:
+The application now features a streamlined workflow with concurrent processing capabilities. To use the application:
 
-1. Update the configuration file with your media library path
-2. Modify the main.go file to process your desired files or implement a file walker
-3. Run the application:
+1. Update the configuration file with your media library path and desired number of worker threads
+2. Run the application:
 
 ```bash
 go run cmd/vmu/main.go
 ```
 
+The application will:
+1. Scan your media library recursively for video files
+2. Process files concurrently using a worker pool
+3. Update each file with metadata from its corresponding NFO file
+4. Provide a summary of results upon completion
+
 ### Future Enhancements
 
 - Command-line interface for easier usage
-- Recursive directory scanning
-- Concurrent processing for faster updates
 - Support for different NFO formats
-- Batch processing capabilities
+- Batch processing with custom file selection
+- Progress reporting and status updates
 
 ## Sample Output
 
@@ -111,7 +116,7 @@ After processing, FFprobe will show the embedded metadata tags in your video fil
 
 ## Limitations and Known Issues
 
-- NFS shares may cause issues with file operations
-- Processing large libraries can be time-consuming without concurrency
+- NFS shares may cause issues with file operations (work in progress)
 - Currently only supports Jellyfin NFO format
 - The application creates temporary files during processing which require additional disk space
+- Error handling for individual file processing failures is implemented, but the application will continue processing other files
