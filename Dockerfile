@@ -16,7 +16,8 @@ LABEL description="Video Metadata Updater - Embeds metadata from NFO files into 
 LABEL version="0.7.0"
 
 # Create a non-root user for running the application
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+#RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+RUN addgroup -S -g 1000 appgroup && adduser -S -u 1000 -G appgroup appuser
 
 # Copy application binary to standard location
 COPY --from=builder /app/vmu /usr/local/bin/vmu
