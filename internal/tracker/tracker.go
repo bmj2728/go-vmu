@@ -84,7 +84,7 @@ func (p *ProgressTracker) updateDescription() {
 	activeCount := 0
 	for _, progress := range p.currentFiles {
 		if activeCount < 3 { // Show max 3 active files
-			desc += fmt.Sprintf(" | %s: %s", filepath.Base(progress.filename), progress.stage)
+			desc += fmt.Sprintf("\n%s: %s", filepath.Base(progress.filename), progress.stage)
 			activeCount++
 		}
 	}

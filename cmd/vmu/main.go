@@ -35,8 +35,8 @@ func main() {
 
 			// setup logger
 			logger.Setup(logger.NewLoggerConfig(verbose))
-
-			log.Debug().Msg("Starting vmu")
+			log.Info().Msgf("is verbose - %v", verbose)
+			log.Info().Msg("Starting vmu")
 
 			// Validate arguments
 
@@ -89,7 +89,7 @@ func main() {
 
 	// Define flags
 	rootCmd.Flags().IntVarP(&workerCount, "workers", "w", runtime.NumCPU(), "Number of concurrent workers")
-	rootCmd.Flags().BoolP("verbose", "v", false, "Verbose output")
+	rootCmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "Verbose output")
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
