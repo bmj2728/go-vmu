@@ -14,6 +14,19 @@ The application follows a simple workflow:
 3. Updates the video files using FFmpeg while preserving the original video and audio quality
 4. Validates the updated file to ensure no corruption occurred
 
+## Current Status
+
+### Working Features
+- Local batch processing of files
+- Command-line interface with Cobra CLI
+- Concurrent processing with worker pools
+- Real-time progress tracking
+- Logging with configurable verbosity
+
+### Known Issues
+- NFS shares may cause failures during processing
+- Intermittent file errors may occur with local files
+
 ## Requirements
 
 - Go 1.16 or higher
@@ -29,51 +42,42 @@ cd go-vmu
 
 # Build the application
 go build -o vmu ./cmd/vmu
-```
 
-## Configuration
-
-Create a `config.toml` file in the application directory or use the provided `sample-config.toml` as a template:
-
-```toml
-nfo_type = "jellyfin"
-scan_folder = "/path/to/your/media/library"
-workers = 4           # Number of concurrent worker threads
-
-[logger]
-level = "info"        # debug, info, warn, error
-pretty = true         # Pretty print logs
-time_format = 1979-05-27T07:32:00
-log_file = "./vmu.log"
-max_size = 4          # Max size in MB
-max_age = 14          # Max age in days
-max_backups = 10      # Max number of backup files
-compress_backup = false
+# Install the binary (optional)
+sudo cp vmu /usr/local/bin/
+sudo chmod +x /usr/local/bin/vmu
 ```
 
 ## Usage
 
-The application now features a streamlined workflow with concurrent processing capabilities. To use the application:
-
-1. Update the configuration file with your media library path and desired number of worker threads
-2. Run the application:
+The application features a command-line interface for easy usage:
 
 ```bash
-go run cmd/vmu/main.go
+# Basic usage
+vmu /path/to/your/media/library
+
+# Specify number of worker threads
+vmu /path/to/your/media/library --workers 4
+
+# Enable verbose logging
+vmu /path/to/your/media/library --verbose
+
+# Combine options
+vmu /path/to/your/media/library --workers 4 --verbose
 ```
 
 The application will:
 1. Scan your media library recursively for video files
 2. Process files concurrently using a worker pool
-3. Update each file with metadata from its corresponding NFO file
-4. Provide a summary of results upon completion
+3. Display real-time progress with file names and processing stages
+4. Update each file with metadata from its corresponding NFO file
+5. Provide a summary of results upon completion
 
 ### Future Enhancements
 
-- Command-line interface for easier usage
 - Support for different NFO formats
-- Batch processing with custom file selection
-- Progress reporting and status updates
+- Improved NFS share compatibility
+- Enhanced error recovery for file operations
 
 ## Sample Output
 
@@ -114,9 +118,8 @@ After processing, FFprobe will show the embedded metadata tags in your video fil
 }
 ```
 
-## Limitations and Known Issues
+## Technical Limitations
 
-- NFS shares may cause issues with file operations (work in progress)
 - Currently only supports Jellyfin NFO format
 - The application creates temporary files during processing which require additional disk space
 - Error handling for individual file processing failures is implemented, but the application will continue processing other files
