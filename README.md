@@ -118,6 +118,44 @@ After processing, FFprobe will show the embedded metadata tags in your video fil
 }
 ```
 
+## Docker
+
+You can build and run Go-VMU using Docker, which eliminates the need to install Go, FFmpeg, and FFprobe on your host system.
+
+### Building the Docker Image
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/go-vmu.git
+cd go-vmu
+
+# Build the Docker image
+docker build -t go-vmu .
+```
+
+### Running with Docker
+
+```bash
+# Basic usage
+docker run -v /path/to/your/media/library:/videos go-vmu /videos
+
+# Specify number of worker threads
+docker run -v /path/to/your/media/library:/videos go-vmu /videos --workers 4
+
+# Enable verbose logging
+docker run -v /path/to/your/media/library:/videos go-vmu /videos --verbose
+
+# Combine options
+docker run -v /path/to/your/media/library:/videos go-vmu /videos --workers 4 --verbose
+```
+
+The Docker container:
+1. Uses a hardened Alpine Linux base image for security
+2. Includes the Go-VMU binary and required FFmpeg/FFprobe binaries
+3. Runs as a non-root user for improved security
+4. Mounts your media directory to `/videos` inside the container
+5. Processes your files with the same functionality as the native application
+
 ## Technical Limitations
 
 - Currently only supports Jellyfin NFO format
