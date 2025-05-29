@@ -118,7 +118,7 @@ After processing, FFprobe will show the embedded metadata tags in your video fil
 }
 ```
 
-## Docker
+## Docker - Coming Soon
 
 You can build and run Go-VMU using Docker, which eliminates the need to install Go, FFmpeg, and FFprobe on your host system.
 

@@ -22,7 +22,7 @@ RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 COPY --from=builder /app/vmu /usr/local/bin/vmu
 
 # Create videos directory as mount point with proper permissions
-RUN mkdir -p /videos && chmod 755 /videos
+RUN mkdir -p /videos && chmod 766 /videos
 
 # Copy only the FFmpeg and FFprobe binaries
 COPY --from=ffmpeg-builder /usr/local/bin/ffmpeg /usr/local/bin/ffmpeg
