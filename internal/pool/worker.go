@@ -154,6 +154,11 @@ func (w *Worker) processFile(filePath string) *ProcessResult {
 	success = true
 
 	log.Debug().Msgf("Worker %d processed file successfully: %s", w.Id, filePath)
+
+	if w.ProgressTracker != nil {
+		w.ProgressTracker.CompleteFile(filePath)
+	}
+
 	//share results
 	return result.WithResult(success, err)
 }
