@@ -14,11 +14,7 @@ import (
 // Setup configures the global logger
 func Setup(cfg *config.LoggerConfig) {
 	// Set the default time format
-	timeFormatString := "1979-05-27T07:32:00"
-	// If TimeFormat is specified, use it instead
-	if !cfg.TimeFormat.IsZero() {
-		timeFormatString = cfg.TimeFormat.String()
-	}
+	timeFormatString := "2006-01-02 15:04:05"
 
 	// Set the logger level
 	level, err := zerolog.ParseLevel(cfg.Level)

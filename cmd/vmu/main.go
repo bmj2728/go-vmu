@@ -3,9 +3,14 @@ package main
 import (
 	"fmt"
 	"github.com/rs/zerolog/log"
+	"github.com/spf13/cobra"
 	"go-vmu/internal/config"
 	"go-vmu/internal/logger"
+	"go-vmu/internal/pool"
 	"go-vmu/internal/processor"
+	"os"
+	"runtime"
+	"time"
 )
 
 //TODO - status - kinda works! I'm able to locally process a batch of files - nfs share is an issue
@@ -13,31 +18,102 @@ import (
 // - nfs share
 
 func main() {
-	// load config
-	cfg, err := config.Load("././config.toml")
-	if err != nil {
-		fmt.Printf("Error loading config: %v\n", err)
+
+	var workerCount int
+	var verbose bool
+
+	rootCmd := &cobra.Command{
+		Use:   "vmu [directory]",
+		Short: "Video Metadata Updater",
+		Long:  "Update metadata in video files based on NFO files",
+		Args:  cobra.ExactArgs(1),
+		Run: func(cmd *cobra.Command, args []string) {
+
+			level := "info"
+
+			if verbose {
+				level = "debug"
+			}
+
+			// setup logger
+			logger.Setup(&config.LoggerConfig{
+				Level:      level,
+				Pretty:     true,
+				TimeFormat: time.RFC3339,
+				LogFile:    "./vmu.log",
+				MaxSize:    5,
+				MaxBackups: 5,
+				MaxAge:     14,
+				Compress:   false,
+			})
+
+			log.Debug().Msg("Starting vmu")
+
+			// Validate arguments
+
+			//ensure sane worker count
+			if workerCount < 1 {
+				workerCount = 1
+				log.Warn().Msg("Worker count must be greater than 0, defaulting to 1")
+			}
+			if workerCount > runtime.NumCPU() {
+				workerCount = runtime.NumCPU()
+				log.Warn().Msgf("Worker count must be less than %d, defaulting to %d", runtime.NumCPU(), runtime.NumCPU())
+			}
+
+			directory := args[0]
+
+			// Validate directory
+			path, err := os.Stat(directory)
+			if err != nil {
+				fmt.Printf("Error: %v\n", err)
+				os.Exit(1)
+			}
+			if !path.IsDir() {
+				fmt.Printf("Error: %s is not a directory\n", directory)
+				os.Exit(1)
+			}
+			if len(directory) == 0 {
+				fmt.Printf("Error: directory is empty\n")
+				os.Exit(1)
+			}
+
+			log.Info().Msgf("Processing directory: %s with %d workers\n", directory, workerCount)
+
+			// Initialize processor
+			proc := processor.NewProcessor(workerCount)
+
+			// Process files
+			results, err := proc.ProcessDirectory(directory)
+			if err != nil {
+				fmt.Printf("Error: %v\n", err)
+				os.Exit(1)
+			}
+
+			// Report results
+			fmt.Printf("Processed %d files. Success: %d, Failed: %d\n",
+				len(results),
+				countSuccesses(results),
+				len(results)-countSuccesses(results))
+		},
 	}
-	// setup logger
-	logger.Setup(&cfg.Logger)
 
-	log.Debug().Str("startup", "logger").Msg("Logger started")
-	log.Debug().Msgf("Config: %v", cfg)
+	// Define flags
+	rootCmd.Flags().IntVarP(&workerCount, "workers", "w", runtime.NumCPU(), "Number of concurrent workers")
+	rootCmd.Flags().BoolP("verbose", "v", false, "Verbose output")
 
-	proc := processor.NewProcessor(cfg.Workers)
-	results, err := proc.ProcessDirectory(cfg.ScanFolder)
-	if err != nil {
-		log.Error().Err(err).Msg("Error processing directory")
-		return
+	if err := rootCmd.Execute(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
 	}
+}
 
-	// print results
-	for _, result := range results {
-		if result.Success {
-			log.Debug().Msgf("Result: %s - %v", result.FilePath, result.Success)
-		} else {
-			log.Error().Msgf("Result: %s - %v", result.FilePath, result.Error)
+func countSuccesses(results []*pool.ProcessResult) int {
+	count := 0
+	for _, r := range results {
+		if r.Success {
+			count++
 		}
 	}
-
+	return count
 }
