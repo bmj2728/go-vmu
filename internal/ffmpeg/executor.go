@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/rs/zerolog/log"
+	"go-vmu/internal/tracker"
 	"go-vmu/internal/utils"
 	"go-vmu/internal/validator"
 	"io"
@@ -13,16 +14,18 @@ import (
 )
 
 type Executor struct {
-	Command   *FFmpegCommand
-	Validator *validator.Validator
-	backup    string
+	Command         *FFmpegCommand
+	Validator       *validator.Validator
+	ProgressTracker *tracker.ProgressTracker
+	backup          string
 }
 
-func NewExecutor(cmd *FFmpegCommand) *Executor {
+func NewExecutor(cmd *FFmpegCommand, tracker *tracker.ProgressTracker) *Executor {
 	newValidator := validator.NewValidator(cmd.inputFile, cmd.outputFile, 10)
 	return &Executor{
-		Command:   cmd,
-		Validator: newValidator,
+		Command:         cmd,
+		Validator:       newValidator,
+		ProgressTracker: tracker,
 	}
 }
 
@@ -37,6 +40,12 @@ func (e *Executor) Execute() error {
 
 	//backup the file
 	log.Debug().Msg("Backing up file")
+
+	//update the tracker
+	if e.ProgressTracker != nil {
+		e.ProgressTracker.UpdateStage(e.Command.inputFile, tracker.StageBackup)
+	}
+
 	err = e.backupFile()
 	if err != nil {
 		log.Error().Err(err).Msg("Error copying file")
@@ -47,6 +56,11 @@ func (e *Executor) Execute() error {
 	//execute the command
 	command := exec.Command("ffmpeg", e.Command.args...)
 	log.Debug().Msgf("Executing command: %v", command.Args)
+
+	//update the tracker
+	if e.ProgressTracker != nil {
+		e.ProgressTracker.UpdateStage(e.Command.inputFile, tracker.StageProcess)
+	}
 	err = command.Run()
 	if err != nil {
 		log.Error().Err(err).Msg("Error running command")
@@ -74,6 +88,10 @@ func (e *Executor) Execute() error {
 }
 
 func (e *Executor) ValidateNewFile() (bool, error) {
+	//update the tracker
+	if e.ProgressTracker != nil {
+		e.ProgressTracker.UpdateStage(e.Command.inputFile, tracker.StageValidate)
+	}
 	err := e.Validator.Validate()
 	if err != nil {
 		log.Error().Err(err).Msg("Error validating new file")
@@ -96,7 +114,10 @@ func (e *Executor) ValidateNewFile() (bool, error) {
 }
 
 func (e *Executor) Cleanup() error {
-
+	//update the tracker
+	if e.ProgressTracker != nil {
+		e.ProgressTracker.UpdateStage(e.Command.inputFile, tracker.StageCleanup)
+	}
 	// open source file for reading
 	sourceFile, err := os.Open(e.Command.outputFile)
 	if err != nil {

@@ -8,7 +8,7 @@ import (
 	"go-vmu/internal/processor"
 )
 
-//TODO - status - kinda works! I'm able to locally process a file - nfs share is an issue
+//TODO - status - kinda works! I'm able to locally process a batch of files - nfs share is an issue
 // what doesn't work right:
 // - nfs share
 

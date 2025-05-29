@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"github.com/rs/zerolog/log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -36,4 +37,39 @@ func NFOPath(path string) (string, error) {
 	}
 
 	return nfoPath, nil
+}
+
+func GetFiles(path string) ([]string, int, error) {
+	//to store paths
+	var files []string
+	//go get em
+	err := filepath.Walk(path,
+		// Helper function to collect paths
+		func(path string, info os.FileInfo, err error) error {
+			log.Debug().Msgf("Checking %s", path)
+			if err != nil {
+				return err
+			}
+			if info.IsDir() {
+				return nil
+			} else if strings.HasSuffix(info.Name(), ".avi") ||
+				strings.HasSuffix(info.Name(), ".mp4") ||
+				strings.HasSuffix(info.Name(), ".mkv") ||
+				strings.HasSuffix(info.Name(), ".mpg") ||
+				strings.HasSuffix(info.Name(), ".mov") ||
+				strings.HasSuffix(info.Name(), ".wmv") ||
+				strings.HasSuffix(info.Name(), ".flv") ||
+				strings.HasSuffix(info.Name(), ".m4v") {
+				files = append(files, path)
+				log.Debug().Msgf("Found file: %s", path)
+			}
+			return nil
+		})
+
+	//check for errors
+	if err != nil {
+		return nil, 0, err
+	}
+	log.Debug().Msgf("Found %d files", len(files))
+	return files, len(files), nil
 }

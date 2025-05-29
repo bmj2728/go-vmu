@@ -8,6 +8,7 @@ import (
 	"go-vmu/internal/ffmpeg"
 	"go-vmu/internal/metadata"
 	"go-vmu/internal/nfo"
+	"go-vmu/internal/tracker"
 	"go-vmu/internal/utils"
 	"os"
 	"sync"
@@ -15,21 +16,23 @@ import (
 
 // Worker processes jobs from the pool
 type Worker struct {
-	Id      int
-	Jobs    <-chan string
-	Results chan<- *ProcessResult
-	Wg      *sync.WaitGroup
-	Ctx     context.Context
+	Id              int
+	Jobs            <-chan string
+	Results         chan<- *ProcessResult
+	Wg              *sync.WaitGroup
+	Ctx             context.Context
+	ProgressTracker *tracker.ProgressTracker
 }
 
 // NewWorker creates a new worker
-func NewWorker(id int, jobs <-chan string, results chan<- *ProcessResult, wg *sync.WaitGroup, ctx context.Context) *Worker {
+func NewWorker(id int, jobs <-chan string, results chan<- *ProcessResult, wg *sync.WaitGroup, ctx context.Context, tracker *tracker.ProgressTracker) *Worker {
 	return &Worker{
-		Id:      id,
-		Jobs:    jobs,
-		Results: results,
-		Wg:      wg,
-		Ctx:     ctx,
+		Id:              id,
+		Jobs:            jobs,
+		Results:         results,
+		Wg:              wg,
+		Ctx:             ctx,
+		ProgressTracker: tracker,
 	}
 }
 
@@ -117,7 +120,7 @@ func (w *Worker) processFile(filePath string) *ProcessResult {
 	log.Debug().Msgf("FFmpeg command: %v", cmd)
 
 	//create executor
-	executor := ffmpeg.NewExecutor(cmd)
+	executor := ffmpeg.NewExecutor(cmd, w.ProgressTracker)
 
 	//execute
 	err = executor.Execute()
