@@ -75,6 +75,9 @@ func (w *Worker) processFile(filePath string) *ProcessResult {
 	if err != nil {
 		log.Error().Err(err).Msg("File does not exist")
 		success = false
+		if w.ProgressTracker != nil {
+			w.ProgressTracker.CompleteFile(filePath)
+		}
 		return result.WithResult(success, err)
 	}
 
@@ -83,11 +86,17 @@ func (w *Worker) processFile(filePath string) *ProcessResult {
 	if err != nil {
 		log.Error().Err(err).Msg("Error matching NFO file")
 		success = false
+		if w.ProgressTracker != nil {
+			w.ProgressTracker.CompleteFile(filePath)
+		}
 		return result.WithResult(success, err)
 	}
 	if nfoPath == "" {
 		log.Error().Msg("NFO file not found")
 		success = false
+		if w.ProgressTracker != nil {
+			w.ProgressTracker.CompleteFile(filePath)
+		}
 		return result.WithResult(success, errors.New("NFO file not found"))
 	}
 
@@ -96,6 +105,9 @@ func (w *Worker) processFile(filePath string) *ProcessResult {
 	if err != nil {
 		log.Error().Err(err).Msg("Error parsing NFO file")
 		success = false
+		if w.ProgressTracker != nil {
+			w.ProgressTracker.CompleteFile(filePath)
+		}
 		return result.WithResult(success, err)
 	}
 
@@ -105,6 +117,9 @@ func (w *Worker) processFile(filePath string) *ProcessResult {
 	if err != nil {
 		log.Error().Err(err).Msg("Error translating NFO file")
 		success = false
+		if w.ProgressTracker != nil {
+			w.ProgressTracker.CompleteFile(filePath)
+		}
 		return result.WithResult(success, err)
 	}
 
@@ -114,6 +129,9 @@ func (w *Worker) processFile(filePath string) *ProcessResult {
 	if err != nil {
 		log.Error().Err(err).Msg("Error creating ffmpeg command")
 		success = false
+		if w.ProgressTracker != nil {
+			w.ProgressTracker.CompleteFile(filePath)
+		}
 		return result.WithResult(success, err)
 	}
 	cmd = cmd.GenerateArgs()
@@ -127,6 +145,9 @@ func (w *Worker) processFile(filePath string) *ProcessResult {
 	if err != nil {
 		log.Error().Err(err).Msg("Error executing ffmpeg command")
 		success = false
+		if w.ProgressTracker != nil {
+			w.ProgressTracker.CompleteFile(filePath)
+		}
 		return result.WithResult(success, err)
 	}
 
@@ -135,11 +156,17 @@ func (w *Worker) processFile(filePath string) *ProcessResult {
 	if err != nil {
 		log.Error().Err(err).Msg("Error validating new file")
 		success = false
+		if w.ProgressTracker != nil {
+			w.ProgressTracker.CompleteFile(filePath)
+		}
 		return result.WithResult(success, err)
 	}
 	if !ok {
 		log.Error().Msg("New file is invalid")
 		success = false
+		if w.ProgressTracker != nil {
+			w.ProgressTracker.CompleteFile(filePath)
+		}
 		return result.WithResult(success, err)
 	}
 
@@ -148,6 +175,9 @@ func (w *Worker) processFile(filePath string) *ProcessResult {
 	if err != nil {
 		log.Error().Err(err).Msg("Error cleaning up")
 		success = false
+		if w.ProgressTracker != nil {
+			w.ProgressTracker.CompleteFile(filePath)
+		}
 		return result.WithResult(success, err)
 	}
 
