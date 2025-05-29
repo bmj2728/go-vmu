@@ -37,7 +37,7 @@ The application follows a simple workflow:
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/go-vmu.git
+git clone https://forgejo.brianjipson.com/brian/go-vmu.git
 cd go-vmu
 
 # Build the application
@@ -126,7 +126,7 @@ You can build and run Go-VMU using Docker, which eliminates the need to install 
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/go-vmu.git
+git clone https://forgejo.brianjipson.com/brian/go-vmu.git
 cd go-vmu
 
 # Build the Docker image
