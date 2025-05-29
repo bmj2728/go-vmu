@@ -29,7 +29,7 @@ The application follows a simple workflow:
 
 ## Requirements
 
-- Go 1.16 or higher
+- Go 1.24 or higher
 - FFmpeg and FFprobe installed and available in your PATH
 - Jellyfin-compatible NFO files (Recommended to use Jellyfin automated nfo creation)
 
@@ -150,11 +150,10 @@ docker run -v /path/to/your/media/library:/videos go-vmu /videos --workers 4 --v
 ```
 
 The Docker container:
-1. Uses a hardened Alpine Linux base image for security
-2. Includes the Go-VMU binary and required FFmpeg/FFprobe binaries
-3. Runs as a non-root user for improved security
-4. Mounts your media directory to `/videos` inside the container
-5. Processes your files with the same functionality as the native application
+1. Includes the Go-VMU binary and required FFmpeg/FFprobe binaries
+2. Runs as a non-root user for improved security
+3. Mounts your media directory to `/videos` inside the container
+4. Processes your files with the same functionality as the native application
 
 ## Technical Limitations
 

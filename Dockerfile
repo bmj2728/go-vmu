@@ -1,5 +1,5 @@
 # Multi-stage build with hardened approach
-FROM golang:1.20-alpine AS builder
+FROM golang:1.24-alpine AS builder
 WORKDIR /app
 COPY . .
 RUN go mod download
@@ -7,8 +7,8 @@ RUN go build -o vmu ./cmd/vmu
 
 FROM jrottenberg/ffmpeg:4.4-alpine AS ffmpeg-builder
 
-# Final minimal hardened image
-FROM docker/hardened-alpine:latest
+# Final with alpine
+FROM alpine:latest
 
 # Add labels for better documentation
 LABEL maintainer="Brian Jipson <brian.jipson@novelgit.com>"
