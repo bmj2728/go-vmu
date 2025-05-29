@@ -1,11 +1,6 @@
-package config
+package logger
 
-type Config struct {
-	NFOType    string       `toml:"nfo_type"`
-	ScanFolder string       `toml:"scan_folder"`
-	Workers    int          `toml:"workers"`
-	Logger     LoggerConfig `toml:"logger"`
-}
+import "time"
 
 type LoggerConfig struct {
 	Level      string `toml:"level"`
@@ -18,6 +13,19 @@ type LoggerConfig struct {
 	Compress   bool   `toml:"compress"`
 }
 
-func NewConfig() *Config {
-	return &Config{}
+func NewLoggerConfig(verbose bool) *LoggerConfig {
+	level := "info"
+	if verbose {
+		level = "debug"
+	}
+	return &LoggerConfig{
+		Level:      level,
+		Pretty:     true,
+		TimeFormat: time.RFC3339,
+		LogFile:    "./vmu.log",
+		MaxSize:    5,
+		MaxBackups: 5,
+		MaxAge:     14,
+		Compress:   false,
+	}
 }

@@ -4,13 +4,11 @@ import (
 	"fmt"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
-	"go-vmu/internal/config"
 	"go-vmu/internal/logger"
 	"go-vmu/internal/pool"
 	"go-vmu/internal/processor"
 	"os"
 	"runtime"
-	"time"
 )
 
 //TODO - status I'm able to locally process a batch of files - nfs share is an issue
@@ -35,23 +33,8 @@ func main() {
 		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 
-			level := "info"
-
-			if verbose {
-				level = "debug"
-			}
-
 			// setup logger
-			logger.Setup(&config.LoggerConfig{
-				Level:      level,
-				Pretty:     true,
-				TimeFormat: time.RFC3339,
-				LogFile:    "./vmu.log",
-				MaxSize:    5,
-				MaxBackups: 5,
-				MaxAge:     14,
-				Compress:   false,
-			})
+			logger.Setup(logger.NewLoggerConfig(verbose))
 
 			log.Debug().Msg("Starting vmu")
 

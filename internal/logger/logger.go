@@ -5,14 +5,13 @@ import (
 	"github.com/natefinch/lumberjack"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
-	"go-vmu/internal/config"
 	"io"
 	"os"
 	"path/filepath"
 )
 
 // Setup configures the global logger
-func Setup(cfg *config.LoggerConfig) {
+func Setup(cfg *LoggerConfig) {
 	// Set the default time format
 	timeFormatString := "2006-01-02 15:04:05"
 
