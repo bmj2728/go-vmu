@@ -160,3 +160,38 @@ The Docker container:
 - Currently only supports Jellyfin NFO format
 - The application creates temporary files during processing which require additional disk space
 - Error handling for individual file processing failures is implemented, but the application will continue processing other files
+
+## Expected File Organization
+
+Go-VMU expects your media files to be organized with sidecar NFO files in the same directory as the video files. Here's an example of the expected organization pattern:
+
+```
+└── 3 Body Problem
+    ├── Season 1
+    │   ├── 3 Body Problem - S01E01 - Countdown WEBRip-1080p Proper.mkv
+    │   ├── 3 Body Problem - S01E01 - Countdown WEBRip-1080p Proper.nfo
+    │   ├── 3 Body Problem - S01E02 - Red Coast WEBRip-1080p Proper.mkv
+    │   ├── 3 Body Problem - S01E02 - Red Coast WEBRip-1080p Proper.nfo
+    │   ├── 3 Body Problem - S01E03 - Destroyer of Worlds WEBRip-1080p Proper.mkv
+    │   ├── 3 Body Problem - S01E03 - Destroyer of Worlds WEBRip-1080p Proper.nfo
+    │   ├── 3 Body Problem - S01E04 - Our Lord WEBRip-1080p Proper.mkv
+    │   ├── 3 Body Problem - S01E04 - Our Lord WEBRip-1080p Proper.nfo
+    │   ├── 3 Body Problem - S01E05 - Judgment Day WEBRip-1080p Proper.mkv
+    │   ├── 3 Body Problem - S01E05 - Judgment Day WEBRip-1080p Proper.nfo
+    │   ├── 3 Body Problem - S01E06 - The Stars Our Destination WEBRip-1080p Proper.mkv
+    │   ├── 3 Body Problem - S01E06 - The Stars Our Destination WEBRip-1080p Proper.nfo
+    │   ├── 3 Body Problem - S01E07 - Only Advance WEBRip-1080p Proper.mkv
+    │   ├── 3 Body Problem - S01E07 - Only Advance WEBRip-1080p Proper.nfo
+    │   ├── 3 Body Problem - S01E08 - Wallfacer WEBRip-1080p Proper.mkv
+    │   ├── 3 Body Problem - S01E08 - Wallfacer WEBRip-1080p Proper.nfo
+```
+
+The application will automatically match each video file with its corresponding NFO file based on the filename.
+
+## Acknowledgements
+
+Go-VMU would not be possible without these amazing open-source projects:
+
+- [FFmpeg](https://ffmpeg.org/) - The powerful multimedia framework used for video processing
+- [Jellyfin](https://jellyfin.org/) - The free software media system that creates the NFO files
+- [Cobra](https://github.com/spf13/cobra) - The CLI framework that powers our command-line interface
