@@ -1,7 +1,7 @@
 package utils
 
-import "fmt"
+import "al.essio.dev/pkg/shellescape"
 
 func QuoteString(s string) string {
-	return fmt.Sprintf("\"%s\"", s)
+	return shellescape.Quote(s)
 }
