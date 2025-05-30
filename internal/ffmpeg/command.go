@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/rs/zerolog/log"
 	"go-vmu/internal/metadata"
+	"go-vmu/internal/utils"
+	"reflect"
 	"strings"
 )
 
@@ -55,13 +57,17 @@ func (cmd *FFmpegCommand) WithMetadata(meta metadata.Metadata) (*FFmpegCommand, 
 }
 
 func (cmd *FFmpegCommand) GenerateArgs() *FFmpegCommand {
-	args := []string{"-i", cmd.inputFile, "-c", "copy"}
+
+	args := []string{"-loglevel", "debug", "-i", utils.QuoteString(cmd.inputFile), "-c", "copy"}
 
 	for key, value := range cmd.metadata {
-		args = append(args, "-metadata", fmt.Sprintf("%s=%v", key, value))
+		if reflect.TypeOf(value).String() == "string" {
+			value = utils.QuoteString(value.(string))
+		}
+		args = append(args, "-metadata", fmt.Sprintf("%s=%v", utils.QuoteString(key), value))
 	}
 
-	args = append(args, cmd.outputFile)
+	args = append(args, utils.QuoteString(cmd.outputFile))
 
 	return &FFmpegCommand{
 		inputFile:  cmd.inputFile,

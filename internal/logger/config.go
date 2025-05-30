@@ -22,7 +22,7 @@ func NewLoggerConfig(verbose bool) *LoggerConfig {
 		Level:      level,
 		Pretty:     true,
 		TimeFormat: time.RFC3339,
-		LogFile:    "./vmu.log",
+		LogFile:    "",
 		MaxSize:    5,
 		MaxBackups: 5,
 		MaxAge:     14,

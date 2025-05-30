@@ -11,7 +11,9 @@ import (
 	"runtime"
 )
 
-//TODO - status I'm able to locally process a batch of files - nfs share is an issue
+//TODO - string handling for metadata and command line args need some fixing
+// ensure all strings are property escaped or quoted
+//
 // what doesn't work right:
 // - nfs share causes failures
 // - intermittent file errors locally
