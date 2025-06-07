@@ -15,7 +15,7 @@ type Validator struct {
 
 func NewValidator(oldFile string, newFile string, timeoutSecs time.Duration) *Validator {
 	timeout := timeoutSecs * time.Second
-	log.Info().Str("timeout", timeout.String())
+	log.Info().Str("timeout", timeout.String()).Msgf("Timeout set to %v", timeout)
 	oldProber := NewMediaProber(timeout)
 	newProber := NewMediaProber(timeout)
 	return &Validator{

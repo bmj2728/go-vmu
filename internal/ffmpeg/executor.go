@@ -12,7 +12,6 @@ import (
 	"os"
 	"os/exec"
 	"strings"
-	"time"
 )
 
 type Executor struct {
@@ -54,12 +53,6 @@ func (e *Executor) Execute() error {
 		return err
 	}
 	log.Debug().Msgf("File backed up to %s", e.backup)
-
-	// *** TEMPORARY: Add a small delay for diagnostic purposes to rule out file contention ***
-	// REMOVE THIS IN PRODUCTION AFTER TESTING
-	log.Debug().Msg("Pausing for 100ms to allow file handles to release (diagnostic).")
-	time.Sleep(100 * time.Millisecond)
-	// ***********************************************************************************
 
 	//execute the command
 	command := exec.Command("ffmpeg", e.FFmpegCommand.args...)
