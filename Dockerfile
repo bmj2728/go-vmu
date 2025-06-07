@@ -1,11 +1,15 @@
 # Multi-stage build with hardened approach
+
+# Builder stage: Build the Go application
 FROM golang:1.24-alpine AS builder
 WORKDIR /app
-COPY . .
+COPY go.mod go.sum ./
 RUN go mod download
+COPY . .
 RUN go build -o vmu ./cmd/vmu
 
-FROM jrottenberg/ffmpeg:4.4-alpine AS ffmpeg-builder
+# Final stage: Create the runtime image
+FROM jrottenberg/ffmpeg:4.4-alpine
 
 # Add labels for better documentation
 LABEL maintainer="Brian Jipson <brian.jipson@novelgit.com>"
@@ -13,25 +17,20 @@ LABEL description="Video Metadata Updater - Embeds metadata from NFO files into 
 LABEL version="0.7.0"
 
 # Create a non-root user for running the application
-#RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-RUN #addgroup -S -g 1000 appgroup && adduser -S -u 1000 -G appgroup appuser
+# ensuring correct permissions for bind-mounted volumes.
+RUN addgroup -S -g 100 appgroup && adduser -S -u 1024 -G appgroup appuser
 
 # Copy application binary to standard location
 COPY --from=builder /app/vmu /usr/local/bin/vmu
 
 # Create videos directory as mount point with proper permissions
-RUN mkdir -p /videos && chmod 766 /videos
-
-
-# Copy only the FFmpeg and FFprobe binaries
-#COPY --from=ffmpeg-builder /usr/local/bin/ffmpeg /usr/local/bin/ffmpeg
-#COPY --from=ffmpeg-builder /usr/local/bin/ffprobe /usr/local/bin/ffprobe
+RUN mkdir -p /videos && chmod 777 /videos
 
 # Declare the volume mount point
 VOLUME ["/videos"]
 
 # Switch to non-root user
-#USER appuser
+USER appuser
 
 # Set entrypoint
 ENTRYPOINT ["vmu"]
