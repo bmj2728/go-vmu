@@ -22,10 +22,8 @@ type Executor struct {
 }
 
 func NewExecutor(cmd *FFmpegCommand, tracker *tracker.ProgressTracker) *Executor {
-	newValidator := validator.NewValidator(cmd.inputFile, cmd.outputFile, 300)
 	return &Executor{
 		FFmpegCommand:   cmd,
-		Validator:       newValidator,
 		ProgressTracker: tracker,
 	}
 }
@@ -101,6 +99,7 @@ func (e *Executor) Execute() error {
 }
 
 func (e *Executor) ValidateNewFile() (bool, error) {
+	e.Validator = validator.NewValidator(e.FFmpegCommand.inputFile, e.FFmpegCommand.outputFile, 300)
 	//update the tracker
 	if e.ProgressTracker != nil {
 		e.ProgressTracker.UpdateStage(e.FFmpegCommand.inputFile, tracker.StageValidate)
