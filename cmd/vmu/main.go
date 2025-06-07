@@ -11,18 +11,6 @@ import (
 	"runtime"
 )
 
-//TODO - string handling for metadata and command line args need some fixing
-// ensure all strings are property escaped or quoted
-//
-// what doesn't work right:
-// - nfs share causes failures
-// - intermittent file errors locally
-// what works:
-// - local file processing
-// - cobra cli
-// - logging
-// - progress tracker
-
 func main() {
 
 	var workerCount int
