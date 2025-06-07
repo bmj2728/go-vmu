@@ -22,7 +22,7 @@ type Executor struct {
 }
 
 func NewExecutor(cmd *FFmpegCommand, tracker *tracker.ProgressTracker) *Executor {
-	newValidator := validator.NewValidator(cmd.inputFile, cmd.outputFile, 60)
+	newValidator := validator.NewValidator(cmd.inputFile, cmd.outputFile, 300)
 	return &Executor{
 		FFmpegCommand:   cmd,
 		Validator:       newValidator,
