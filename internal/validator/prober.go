@@ -14,7 +14,7 @@ type MediaProber struct {
 }
 
 func NewMediaProber(timeout time.Duration) *MediaProber {
-	ctx, cancelFn := context.WithTimeout(context.Background(), timeout*time.Second)
+	ctx, cancelFn := context.WithTimeout(context.Background(), timeout)
 	return &MediaProber{
 		Context:  ctx,
 		CancelFn: cancelFn,

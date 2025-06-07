@@ -23,7 +23,7 @@ type Executor struct {
 }
 
 func NewExecutor(cmd *FFmpegCommand, tracker *tracker.ProgressTracker) *Executor {
-	newValidator := validator.NewValidator(cmd.inputFile, cmd.outputFile, 10)
+	newValidator := validator.NewValidator(cmd.inputFile, cmd.outputFile, 60)
 	return &Executor{
 		FFmpegCommand:   cmd,
 		Validator:       newValidator,
@@ -248,7 +248,7 @@ func (e *Executor) backupFile() error {
 }
 
 func closeFile(file *os.File, fileType string) {
-	if err := file.Close(); err != nil {
+	if err := file.Close(); err != nil && !errors.Is(err, os.ErrClosed) {
 		log.Error().Err(err).Msgf("Error closing %s file", fileType)
 	}
 }

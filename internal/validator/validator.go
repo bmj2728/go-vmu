@@ -7,36 +7,38 @@ import (
 )
 
 type Validator struct {
-	old       string
-	new       string
+	oldFile   string
+	newFile   string
 	oldProber *MediaProber
 	newProber *MediaProber
 }
 
-func NewValidator(old string, new string, timeout time.Duration) *Validator {
+func NewValidator(oldFile string, newFile string, timeoutSecs time.Duration) *Validator {
+	timeout := timeoutSecs * time.Second
+	log.Info().Str("timeout", timeout.String())
 	oldProber := NewMediaProber(timeout)
 	newProber := NewMediaProber(timeout)
 	return &Validator{
-		old:       old,
-		new:       new,
+		oldFile:   oldFile,
+		newFile:   newFile,
 		oldProber: oldProber,
 		newProber: newProber,
 	}
 }
 
 func (v *Validator) Validate() error {
-	err := v.oldProber.Probe(v.old)
+	err := v.oldProber.Probe(v.oldFile)
 	if err != nil {
 		return err
 	}
-	err = v.newProber.Probe(v.new)
+	err = v.newProber.Probe(v.newFile)
 	if err != nil {
 		return err
 	}
 
-	//returned Duration mismatch: old: 68.10593333333334  new: 68.10591666666667
+	//returned Duration mismatch: oldFile: 68.10593333333334  newFile: 68.10591666666667
 	//if v.oldProber.DurationMinutes() != v.newProber.DurationMinutes() {
-	//	log.Error().Msgf("Duration mismatch: old: %v  new: %v", v.oldProber.DurationMinutes(), v.newProber.DurationMinutes())
+	//	log.Error().Msgf("Duration mismatch: oldFile: %v  newFile: %v", v.oldProber.DurationMinutes(), v.newProber.DurationMinutes())
 	//	return fmt.Errorf("duration mismatch")
 	//}
 
@@ -79,9 +81,9 @@ func (v *Validator) Validate() error {
 		log.Error().Msg("Audio channels mismatch")
 		return fmt.Errorf("audio channels mismatch")
 	}
-	//hmmmm Size mismatch old: 1696803304  new: 1692549566
+	//hmmmm Size mismatch oldFile: 1696803304  newFile: 1692549566
 	//if v.oldProber.Size() != v.newProber.Size() {
-	//	log.Error().Msgf("Size mismatch old: %v new: %v", v.oldProber.Size(), v.newProber.Size())
+	//	log.Error().Msgf("Size mismatch oldFile: %v newFile: %v", v.oldProber.Size(), v.newProber.Size())
 	//	return fmt.Errorf("size mismatch")
 	//}
 
