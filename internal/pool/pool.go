@@ -46,8 +46,18 @@ func (p *Pool) Submit(filePath string) {
 
 // Wait waits for all jobs to complete and returns results
 func (p *Pool) Wait() []*ProcessResult {
-	close(p.Jobs) // No more jobs will be submitted
-	p.Wg.Wait()   // Wait for all workers to finish
+	// Use a defer to recover from panic if the channel is already closed
+	defer func() {
+		if r := recover(); r != nil {
+			// Channel was already closed, ignore the panic
+			log.Debug().Msg("Jobs channel was already closed")
+		}
+	}()
+
+	// Try to close the Jobs channel
+	close(p.Jobs)
+
+	p.Wg.Wait() // Wait for all workers to finish
 	close(p.Results)
 
 	var processResults []*ProcessResult

@@ -51,10 +51,16 @@ func (m *MediaProber) Probe(path string) error {
 }
 
 func (m *MediaProber) DurationMinutes() float64 {
+	if m.Data == nil || m.Data.Format == nil {
+		return 0.0
+	}
 	return m.Data.Format.Duration().Minutes()
 }
 
 func (m *MediaProber) VideoCodec() string {
+	if m.Data == nil {
+		return ""
+	}
 	video := m.Data.FirstVideoStream()
 	if video == nil {
 		return ""
@@ -63,6 +69,9 @@ func (m *MediaProber) VideoCodec() string {
 }
 
 func (m *MediaProber) VideoBitrate() string {
+	if m.Data == nil {
+		return ""
+	}
 	video := m.Data.FirstVideoStream()
 	if video == nil {
 		return ""
@@ -72,6 +81,9 @@ func (m *MediaProber) VideoBitrate() string {
 }
 
 func (m *MediaProber) VideoHeight() int {
+	if m.Data == nil {
+		return 0
+	}
 	video := m.Data.FirstVideoStream()
 	if video == nil {
 		return 0
@@ -80,6 +92,9 @@ func (m *MediaProber) VideoHeight() int {
 }
 
 func (m *MediaProber) VideoWidth() int {
+	if m.Data == nil {
+		return 0
+	}
 	video := m.Data.FirstVideoStream()
 	if video == nil {
 		return 0
@@ -88,6 +103,9 @@ func (m *MediaProber) VideoWidth() int {
 }
 
 func (m *MediaProber) VideoAspectRatio() string {
+	if m.Data == nil {
+		return ""
+	}
 	video := m.Data.FirstVideoStream()
 	if video == nil {
 		return ""
@@ -96,6 +114,9 @@ func (m *MediaProber) VideoAspectRatio() string {
 }
 
 func (m *MediaProber) AudioCodec() string {
+	if m.Data == nil {
+		return ""
+	}
 	audio := m.Data.FirstAudioStream()
 	if audio == nil {
 		return ""
@@ -104,6 +125,9 @@ func (m *MediaProber) AudioCodec() string {
 }
 
 func (m *MediaProber) AudioBitrate() string {
+	if m.Data == nil {
+		return ""
+	}
 	audio := m.Data.FirstAudioStream()
 	if audio == nil {
 		return ""
@@ -113,6 +137,9 @@ func (m *MediaProber) AudioBitrate() string {
 }
 
 func (m *MediaProber) AudioChannels() int {
+	if m.Data == nil {
+		return 0
+	}
 	audio := m.Data.FirstAudioStream()
 	if audio == nil {
 		return 0
@@ -121,5 +148,8 @@ func (m *MediaProber) AudioChannels() int {
 }
 
 func (m *MediaProber) Size() string {
+	if m.Data == nil || m.Data.Format == nil {
+		return ""
+	}
 	return m.Data.Format.Size
 }
