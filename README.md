@@ -1,9 +1,13 @@
 # Go-VMU
 ### Video Metadata Updater
 
+<!-- Logo will go here -->
+
+<!-- Badges will go here -->
+
 ## What Is It?
 
-The Go Video Metadata Updater (Go-VMU) is designed to parse metadata from Jellyfin-created NFO files and update video files with that metadata. This tool helps maintain consistent metadata across your media library by extracting information from NFO files and embedding it directly into the video files.
+The Go Video Metadata Updater (Go-VMU) is designed to parse metadata from Jellyfin-created NFO files and update video files with that metadata. This tool helps maintain consistent metadata across your media library by extracting information from NFO files and embedding it directly into the video files. With significant stability improvements, Go-VMU now provides reliable metadata updating for both local and network-mounted file systems.
 
 ## How It Works
 
@@ -18,14 +22,15 @@ The application follows a simple workflow:
 
 ### Working Features
 - Local batch processing of files
+- Support for NFS/network-mounted file systems
 - Command-line interface with Cobra CLI
 - Concurrent processing with worker pools
 - Real-time progress tracking
 - Logging with configurable verbosity
 
-### Known Issues
-- NFS shares may cause failures during processing
-- Intermittent file errors may occur with local files
+### Performance Notes
+- Local file processing offers very fast speeds
+- NFS/network processing is fully supported but may be slower with larger files
 
 ## Requirements
 
@@ -66,6 +71,14 @@ vmu /path/to/your/media/library --verbose
 vmu /path/to/your/media/library --workers 4 --verbose
 ```
 
+You can also use shorthand forms of options
+
+```bash
+# --workers can be shortened to -w 
+# --verbose shortened to -v
+vmu /path/to/your/media/library -w 4 -v
+```
+
 The application will:
 1. Scan your media library recursively for video files
 2. Process files concurrently using a worker pool
@@ -76,8 +89,8 @@ The application will:
 ### Future Enhancements
 
 - Support for different NFO formats
-- Improved NFS share compatibility
 - Enhanced error recovery for file operations
+- Prebuilt Docker images and Go packages
 
 ## Sample Output
 
@@ -118,9 +131,9 @@ After processing, FFprobe will show the embedded metadata tags in your video fil
 }
 ```
 
-## Docker - Coming Soon
+## Docker
 
-You can build and run Go-VMU using Docker, which eliminates the need to install Go, FFmpeg, and FFprobe on your host system.
+You can build and run Go-VMU using Docker, which eliminates the need to install Go, FFmpeg, and FFprobe on your host system. We are actively working on providing prebuilt Docker images and Go packages for easier deployment.
 
 ### Building the Docker Image
 
@@ -136,17 +149,26 @@ docker build -t go-vmu .
 ### Running with Docker
 
 ```bash
-# Basic usage
-docker run -v /path/to/your/media/library:/videos go-vmu /videos
+# Basic usage with proper user permissions (IMPORTANT)
+docker run -v /path/to/your/media/library:/videos -e PUID=$(id -u) -e PGID=$(id -g) go-vmu /videos
 
 # Specify number of worker threads
-docker run -v /path/to/your/media/library:/videos go-vmu /videos --workers 4
+docker run -v /path/to/your/media/library:/videos -e PUID=$(id -u) -e PGID=$(id -g) go-vmu /videos --workers 4
 
 # Enable verbose logging
-docker run -v /path/to/your/media/library:/videos go-vmu /videos --verbose
+docker run -v /path/to/your/media/library:/videos -e PUID=$(id -u) -e PGID=$(id -g) go-vmu /videos --verbose
 
 # Combine options
-docker run -v /path/to/your/media/library:/videos go-vmu /videos --workers 4 --verbose
+docker run -v /path/to/your/media/library:/videos -e PUID=$(id -u) -e PGID=$(id -g) go-vmu /videos --workers 4 --verbose
+```
+
+### Important Note on Permissions
+
+It is **critical** to match the PUID and PGID to the owner of your media files for proper access. The examples above use the current user's UID and GID, but you should adjust these values to match the actual owner of your media files.
+
+```bash
+# Manually enter the PUID and PGID values
+docker run -v /path/to/your/media/library:/videos -e PUID=1001 -e PGID=1001 go-vmu /videos --workers 4 --verbose
 ```
 
 The Docker container:
