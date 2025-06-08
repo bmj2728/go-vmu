@@ -1,8 +1,10 @@
 package pool
 
 import (
+	"errors"
 	"testing"
 
+	"github.com/bmj2728/go-vmu/internal/tracker"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -126,4 +128,60 @@ func TestPool_Stop(t *testing.T) {
 	default:
 		t.Fatal("Context should be done after stopping")
 	}
+}
+
+func TestPool_Start(t *testing.T) {
+	// Create a pool with 2 workers
+	pool := NewPool(2)
+	pool.Jobs = make(chan string, 2)
+	pool.Results = make(chan *ProcessResult, 2)
+
+	// Create a tracker
+	tracker := tracker.NewProgressTracker(2)
+
+	// Start the pool
+	pool.Start(tracker)
+
+	// We can't directly verify the WaitGroup, but we can verify that
+	// the pool has started by checking that the workers are running
+	// by submitting a job and getting a result
+
+	// Submit a job
+	pool.Jobs <- "/path/to/file.mkv"
+
+	// Close the jobs channel to signal no more jobs
+	close(pool.Jobs)
+
+	// Wait for the workers to finish
+	results := pool.Wait()
+
+	// Verify we got a result (even though it will be an error since the file doesn't exist)
+	assert.Len(t, results, 1)
+	assert.Equal(t, "/path/to/file.mkv", results[0].FilePath)
+	assert.False(t, results[0].Success)
+	assert.Error(t, results[0].Error)
+}
+
+func TestPool_Wait(t *testing.T) {
+	// Create a pool with 2 workers
+	pool := NewPool(2)
+
+	// Create jobs and results channels
+	pool.Jobs = make(chan string, 2)
+	pool.Results = make(chan *ProcessResult, 2)
+
+	// Add some results to the channel
+	result1 := &ProcessResult{FilePath: "/path/to/file1.mkv", Success: true}
+	result2 := &ProcessResult{FilePath: "/path/to/file2.mkv", Success: false, Error: errors.New("test error")}
+
+	pool.Results <- result1
+	pool.Results <- result2
+
+	// Call Wait
+	results := pool.Wait()
+
+	// Verify the results
+	assert.Len(t, results, 2)
+	assert.Contains(t, results, result1)
+	assert.Contains(t, results, result2)
 }
