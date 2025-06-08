@@ -1,11 +1,11 @@
 # Go-VMU
 ### Video Metadata Updater
 
-<p>
+<p style="text-align: center">
   <img src="assets/go-vmu.jpeg" alt="Go-VMU Logo" width="640"/>
 </p>
 
-<p>
+<p style="text-align: center">
   <a href="https://github.com/bmj2728/go-vmu"><img src="https://img.shields.io/github/stars/bmj2728/go-vmu?style=social" alt="GitHub Stars"></a>
   <a href="https://github.com/bmj2728/go-vmu/issues"><img src="https://img.shields.io/github/issues/bmj2728/go-vmu" alt="GitHub Issues"></a>
   <a href="https://github.com/bmj2728/go-vmu/blob/main/LICENSE"><img src="https://img.shields.io/github/license/bmj2728/go-vmu" alt="License"></a>
