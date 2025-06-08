@@ -60,7 +60,7 @@ func (e *Executor) Execute() error {
 	for i, arg := range e.FFmpegCommand.args {
 		quotedArgs[i] = fmt.Sprintf("'%s'", strings.ReplaceAll(arg, "'", `'\''`)) // Basic shell-safe quoting for display
 	}
-	log.Info().Msgf("Executing FFmpeg command: ffmpeg %s", strings.Join(quotedArgs, " "))
+	log.Debug().Msgf("Executing FFmpeg command: ffmpeg %s", strings.Join(quotedArgs, " "))
 
 	// Capture stdout and stderr
 	var stdout, stderr bytes.Buffer

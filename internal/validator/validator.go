@@ -9,8 +9,8 @@ import (
 type Validator struct {
 	oldFile   string
 	newFile   string
-	oldProber *MediaProber
-	newProber *MediaProber
+	oldProber MediaProberInterface
+	newProber MediaProberInterface
 }
 
 func NewValidator(oldFile string, newFile string, timeoutSecs time.Duration) *Validator {
