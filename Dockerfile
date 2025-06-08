@@ -14,7 +14,7 @@ FROM jrottenberg/ffmpeg:4.4-alpine
 # Add labels for better documentation
 LABEL maintainer="Brian Jipson <brian.jipson@novelgit.com>"
 LABEL description="Video Metadata Updater - Embeds metadata from NFO files into video files"
-LABEL version="0.7.0"
+LABEL version="0.7.2"
 
 # Install su-exec for safe user switching (used by entrypoint.sh)
 # Create a default non-root user and group with placeholder IDs
