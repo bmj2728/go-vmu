@@ -3,8 +3,8 @@ package nfo
 import (
 	"encoding/xml"
 	"fmt"
+	"github.com/bmj2728/go-vmu/internal/utils"
 	"github.com/rs/zerolog/log"
-	"go-vmu/internal/utils"
 	"os"
 )
 

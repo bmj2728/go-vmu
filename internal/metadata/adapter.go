@@ -2,8 +2,8 @@ package metadata
 
 import (
 	"fmt"
+	"github.com/bmj2728/go-vmu/internal/nfo"
 	"github.com/rs/zerolog/log"
-	"go-vmu/internal/nfo"
 	"strings"
 )
 

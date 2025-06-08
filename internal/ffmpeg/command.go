@@ -2,8 +2,8 @@ package ffmpeg
 
 import (
 	"fmt"
+	"github.com/bmj2728/go-vmu/internal/metadata"
 	"github.com/rs/zerolog/log"
-	"go-vmu/internal/metadata"
 	"strings"
 )
 

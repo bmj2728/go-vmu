@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
+	"github.com/bmj2728/go-vmu/internal/logger"
+	"github.com/bmj2728/go-vmu/internal/pool"
+	"github.com/bmj2728/go-vmu/internal/processor"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
-	"go-vmu/internal/logger"
-	"go-vmu/internal/pool"
-	"go-vmu/internal/processor"
 	"os"
 	"runtime"
 )

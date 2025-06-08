@@ -1,4 +1,4 @@
-module go-vmu
+module github.com/bmj2728/go-vmu
 
 go 1.24
 

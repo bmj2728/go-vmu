@@ -1,10 +1,10 @@
 package processor
 
 import (
+	"github.com/bmj2728/go-vmu/internal/pool"
+	"github.com/bmj2728/go-vmu/internal/tracker"
+	"github.com/bmj2728/go-vmu/internal/utils"
 	"github.com/rs/zerolog/log"
-	"go-vmu/internal/pool"
-	"go-vmu/internal/tracker"
-	"go-vmu/internal/utils"
 )
 
 type Processor struct {
