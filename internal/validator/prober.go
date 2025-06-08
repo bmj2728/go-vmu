@@ -6,6 +6,24 @@ import (
 	"time"
 )
 
+// MediaProberInterface defines the interface for media probing operations
+type MediaProberInterface interface {
+	Probe(path string) error
+	DurationMinutes() float64
+	VideoCodec() string
+	VideoBitrate() string
+	VideoHeight() int
+	VideoWidth() int
+	VideoAspectRatio() string
+	AudioCodec() string
+	AudioBitrate() string
+	AudioChannels() int
+	Size() string
+}
+
+// Ensure MediaProber implements MediaProberInterface
+var _ MediaProberInterface = (*MediaProber)(nil)
+
 type MediaProber struct {
 	Context     context.Context
 	CancelFn    context.CancelFunc
