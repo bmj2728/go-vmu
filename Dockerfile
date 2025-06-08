@@ -16,12 +16,19 @@ LABEL maintainer="Brian Jipson <brian.jipson@novelgit.com>"
 LABEL description="Video Metadata Updater - Embeds metadata from NFO files into video files"
 LABEL version="0.7.0"
 
-# Create a non-root user for running the application
-# ensuring correct permissions for bind-mounted volumes.
-RUN addgroup -S -g 100 appgroup && adduser -S -u 1024 -G appgroup appuser
+# Install su-exec for safe user switching (used by entrypoint.sh)
+# Create a default non-root user and group with placeholder IDs
+# These IDs will be changed by the entrypoint.sh script at runtime
+RUN apk add --no-cache su-exec \
+    && addgroup -S appgroup \
+    && adduser -S -G appgroup appuser
 
 # Copy application binary to standard location
 COPY --from=builder /app/vmu /usr/local/bin/vmu
+
+# Copy the entrypoint script and make it executable
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Create videos directory as mount point with proper permissions
 RUN mkdir -p /videos && chmod 777 /videos
@@ -29,8 +36,8 @@ RUN mkdir -p /videos && chmod 777 /videos
 # Declare the volume mount point
 VOLUME ["/videos"]
 
-# Switch to non-root user
-USER appuser
+# Set the entrypoint to our script
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
-# Set entrypoint
-ENTRYPOINT ["vmu"]
+# Set default command if no arguments are provided to docker run
+CMD ["/videos"]
