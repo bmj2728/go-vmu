@@ -1,9 +1,17 @@
 # Go-VMU
 ### Video Metadata Updater
 
-<!-- Logo will go here -->
+<p>
+  <img src="assets/go-vmu.jpeg" alt="Go-VMU Logo" width="640"/>
+</p>
 
-<!-- Badges will go here -->
+<p>
+  <a href="https://github.com/bmj2728/go-vmu"><img src="https://img.shields.io/github/stars/bmj2728/go-vmu?style=social" alt="GitHub Stars"></a>
+  <a href="https://github.com/bmj2728/go-vmu/issues"><img src="https://img.shields.io/github/issues/bmj2728/go-vmu" alt="GitHub Issues"></a>
+  <a href="https://github.com/bmj2728/go-vmu/blob/main/LICENSE"><img src="https://img.shields.io/github/license/bmj2728/go-vmu" alt="License"></a>
+  <a href="https://hub.docker.com/r/bmj2728/go-vmu"><img src="https://img.shields.io/docker/pulls/bmj2728/go-vmu" alt="Docker Pulls"></a>
+  <a href="https://github.com/bmj2728/go-vmu/pkgs/container/go-vmu"><img src="https://img.shields.io/badge/GitHub-Container%20Registry-blue" alt="GitHub Container Registry"></a>
+</p>
 
 ## What Is It?
 
@@ -42,7 +50,7 @@ The application follows a simple workflow:
 
 ```bash
 # Clone the repository
-git clone https://forgejo.brianjipson.com/brian/go-vmu.git
+git clone https://github.com/bmj2728/go-vmu.git
 cd go-vmu
 
 # Build the application
@@ -90,7 +98,7 @@ The application will:
 
 - Support for different NFO formats
 - Enhanced error recovery for file operations
-- Prebuilt Docker images and Go packages
+- Additional metadata customization options
 
 ## Sample Output
 
@@ -133,13 +141,29 @@ After processing, FFprobe will show the embedded metadata tags in your video fil
 
 ## Docker
 
-You can build and run Go-VMU using Docker, which eliminates the need to install Go, FFmpeg, and FFprobe on your host system. We are actively working on providing prebuilt Docker images and Go packages for easier deployment.
+You can run Go-VMU using Docker, which eliminates the need to install Go, FFmpeg, and FFprobe on your host system. Prebuilt Docker images are available on both GitHub Container Registry and Docker Hub.
 
-### Building the Docker Image
+### Using Prebuilt Docker Images
+
+Go-VMU is available as a prebuilt Docker image from:
+- GitHub Container Registry: `ghcr.io/bmj2728/go-vmu:latest`
+- Docker Hub: `bmj2728/go-vmu:latest`
+
+```bash
+# Pull from GitHub Container Registry
+docker pull ghcr.io/bmj2728/go-vmu:latest
+
+# OR pull from Docker Hub
+docker pull bmj2728/go-vmu:latest
+```
+
+### Building the Docker Image Locally
+
+If you prefer to build the image yourself:
 
 ```bash
 # Clone the repository
-git clone https://forgejo.brianjipson.com/brian/go-vmu.git
+git clone https://github.com/bmj2728/go-vmu.git
 cd go-vmu
 
 # Build the Docker image
@@ -150,16 +174,20 @@ docker build -t go-vmu .
 
 ```bash
 # Basic usage with proper user permissions (IMPORTANT)
-docker run -v /path/to/your/media/library:/videos -e PUID=$(id -u) -e PGID=$(id -g) go-vmu /videos
+# Using GitHub Container Registry
+docker run -v /path/to/your/media/library:/videos -e PUID=$(id -u) -e PGID=$(id -g) ghcr.io/bmj2728/go-vmu:latest /videos
+
+# OR using Docker Hub
+docker run -v /path/to/your/media/library:/videos -e PUID=$(id -u) -e PGID=$(id -g) bmj2728/go-vmu:latest /videos
 
 # Specify number of worker threads
-docker run -v /path/to/your/media/library:/videos -e PUID=$(id -u) -e PGID=$(id -g) go-vmu /videos --workers 4
+docker run -v /path/to/your/media/library:/videos -e PUID=$(id -u) -e PGID=$(id -g) ghcr.io/bmj2728/go-vmu:latest /videos --workers 4
 
 # Enable verbose logging
-docker run -v /path/to/your/media/library:/videos -e PUID=$(id -u) -e PGID=$(id -g) go-vmu /videos --verbose
+docker run -v /path/to/your/media/library:/videos -e PUID=$(id -u) -e PGID=$(id -g) ghcr.io/bmj2728/go-vmu:latest /videos --verbose
 
 # Combine options
-docker run -v /path/to/your/media/library:/videos -e PUID=$(id -u) -e PGID=$(id -g) go-vmu /videos --workers 4 --verbose
+docker run -v /path/to/your/media/library:/videos -e PUID=$(id -u) -e PGID=$(id -g) ghcr.io/bmj2728/go-vmu:latest /videos --workers 4 --verbose
 ```
 
 ### Important Note on Permissions
@@ -168,7 +196,11 @@ It is **critical** to match the PUID and PGID to the owner of your media files f
 
 ```bash
 # Manually enter the PUID and PGID values
-docker run -v /path/to/your/media/library:/videos -e PUID=1001 -e PGID=1001 go-vmu /videos --workers 4 --verbose
+# Using GitHub Container Registry
+docker run -v /path/to/your/media/library:/videos -e PUID=1001 -e PGID=1001 ghcr.io/bmj2728/go-vmu:latest /videos --workers 4 --verbose
+
+# OR using Docker Hub
+docker run -v /path/to/your/media/library:/videos -e PUID=1001 -e PGID=1001 bmj2728/go-vmu:latest /videos --workers 4 --verbose
 ```
 
 The Docker container:
