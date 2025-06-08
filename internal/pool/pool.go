@@ -58,13 +58,28 @@ func (p *Pool) Wait() []*ProcessResult {
 	close(p.Jobs)
 
 	p.Wg.Wait() // Wait for all workers to finish
-	close(p.Results)
 
+	// Collect all results that are already in the channel
 	var processResults []*ProcessResult
-	for result := range p.Results {
-		processResults = append(processResults, result)
+	// Keep reading from Results channel until it's empty
+	for {
+		select {
+		case result, ok := <-p.Results:
+			if !ok {
+				// Channel is closed
+				return processResults
+			}
+			processResults = append(processResults, result)
+		default:
+			// No more results available right now
+			close(p.Results)
+			// Drain any remaining results
+			for result := range p.Results {
+				processResults = append(processResults, result)
+			}
+			return processResults
+		}
 	}
-	return processResults
 }
 
 // Stop cancels all workers

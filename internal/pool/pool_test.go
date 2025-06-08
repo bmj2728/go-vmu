@@ -3,6 +3,7 @@ package pool
 import (
 	"errors"
 	"testing"
+	"time"
 
 	"github.com/bmj2728/go-vmu/internal/tracker"
 	"github.com/stretchr/testify/assert"
@@ -149,17 +150,27 @@ func TestPool_Start(t *testing.T) {
 	// Submit a job
 	pool.Jobs <- "/path/to/file.mkv"
 
+	// Wait for the result to be sent to the Results channel
+	// This is similar to how the worker test does it
+	var result *ProcessResult
+	select {
+	case result = <-pool.Results:
+		// Got a result
+	case <-time.After(1 * time.Second):
+		t.Fatal("Timed out waiting for result")
+	}
+
 	// Close the jobs channel to signal no more jobs
 	close(pool.Jobs)
 
 	// Wait for the workers to finish
-	results := pool.Wait()
+	pool.Wait()
 
 	// Verify we got a result (even though it will be an error since the file doesn't exist)
-	assert.Len(t, results, 1)
-	assert.Equal(t, "/path/to/file.mkv", results[0].FilePath)
-	assert.False(t, results[0].Success)
-	assert.Error(t, results[0].Error)
+	assert.NotNil(t, result)
+	assert.Equal(t, "/path/to/file.mkv", result.FilePath)
+	assert.False(t, result.Success)
+	assert.Error(t, result.Error)
 }
 
 func TestPool_Wait(t *testing.T) {
