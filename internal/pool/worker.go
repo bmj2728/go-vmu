@@ -123,6 +123,8 @@ func (w *Worker) processFile(filePath string) *ProcessResult {
 		return result.WithResult(success, err)
 	}
 
+	//TODO add step to check metadata against extracted -- end job early if existing match
+
 	//create ffmpeg command
 	outputFile := utils.InsertTagToFileName(filePath, "govmu-edit")
 	cmd, err := ffmpeg.NewFFmpegCommand().WithInput(filePath).WithOutput(outputFile).WithMetadata(*meta)
