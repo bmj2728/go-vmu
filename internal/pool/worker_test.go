@@ -15,7 +15,7 @@ import (
 func TestNewWorker(t *testing.T) {
 	// Create channels
 	jobs := make(chan string, 1)
-	results := make(chan *ProcessResult, 1)
+	results := make(chan *tracker.ProcessResult, 1)
 
 	// Create WaitGroup
 	var wg sync.WaitGroup
@@ -54,7 +54,7 @@ func TestWorker_Start(t *testing.T) {
 	t.Run("Cancelled context", func(t *testing.T) {
 		// Create channels
 		jobs := make(chan string, 1)
-		results := make(chan *ProcessResult, 1)
+		results := make(chan *tracker.ProcessResult, 1)
 
 		// Create WaitGroup
 		var wg sync.WaitGroup
@@ -92,7 +92,7 @@ func TestWorker_Start(t *testing.T) {
 	t.Run("Closed jobs channel", func(t *testing.T) {
 		// Create channels
 		jobs := make(chan string, 1)
-		results := make(chan *ProcessResult, 1)
+		results := make(chan *tracker.ProcessResult, 1)
 
 		// Create WaitGroup
 		var wg sync.WaitGroup
@@ -130,7 +130,7 @@ func TestWorker_Start(t *testing.T) {
 	t.Run("Job with non-existent file", func(t *testing.T) {
 		// Create channels
 		jobs := make(chan string, 1)
-		results := make(chan *ProcessResult, 1)
+		results := make(chan *tracker.ProcessResult, 1)
 
 		// Create WaitGroup
 		var wg sync.WaitGroup

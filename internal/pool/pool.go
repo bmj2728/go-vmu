@@ -11,7 +11,7 @@ import (
 type Pool struct {
 	Workers         int
 	Jobs            chan string
-	Results         chan *ProcessResult
+	Results         chan *tracker.ProcessResult
 	Wg              sync.WaitGroup
 	Ctx             context.Context
 	CancelFunc      context.CancelFunc
@@ -44,8 +44,10 @@ func (p *Pool) Submit(filePath string) {
 	p.Jobs <- filePath
 }
 
+//TODO update to return done bool and use tracker's Result param
+
 // Wait waits for all jobs to complete and returns results
-func (p *Pool) Wait() []*ProcessResult {
+func (p *Pool) Wait() []*tracker.ProcessResult {
 	// Use a defer to recover from panic if the channel is already closed
 	defer func() {
 		if r := recover(); r != nil {
@@ -60,7 +62,8 @@ func (p *Pool) Wait() []*ProcessResult {
 	p.Wg.Wait() // Wait for all workers to finish
 
 	// Collect all results that are already in the channel
-	var processResults []*ProcessResult
+	// changed way this works, but leaving in for now to avoid potential breaking changes
+	var processResults []*tracker.ProcessResult
 	// Keep reading from Results channel until it's empty
 	for {
 		select {
@@ -91,7 +94,7 @@ func (p *Pool) SubmitJobs(paths []string) int {
 	bufferSize := len(paths) // Use actual file count for buffer
 	log.Debug().Msgf("Creating job channel with buffer size %d for %d files", bufferSize, len(paths))
 	p.Jobs = make(chan string, bufferSize)
-	p.Results = make(chan *ProcessResult, bufferSize)
+	p.Results = make(chan *tracker.ProcessResult, bufferSize)
 	// Submit all jobs
 	for _, path := range paths {
 		p.Submit(path)
