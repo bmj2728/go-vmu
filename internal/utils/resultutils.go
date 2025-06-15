@@ -34,6 +34,19 @@ func PrintStatusCounts(counts map[tracker.ProcessStatus]int) {
 	}
 }
 
+func SplitResults(results []*tracker.ProcessResult) ([]*tracker.ProcessResult, []*tracker.ProcessResult) {
+	successes := make([]*tracker.ProcessResult, 0)
+	failures := make([]*tracker.ProcessResult, 0)
+	for _, r := range results {
+		if r.Status == tracker.StatusSuccess || r.Status == tracker.StatusSkipped {
+			successes = append(successes, r)
+		} else {
+			failures = append(failures, r)
+		}
+	}
+	return successes, failures
+}
+
 func SaveResults(filePath string, results []*tracker.ProcessResult) error {
 
 	humanizedResults := make([]*tracker.HumanReadableResult, 0)

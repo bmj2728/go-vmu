@@ -8,6 +8,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"os"
+	"path/filepath"
 	"runtime"
 )
 
@@ -15,6 +16,9 @@ func main() {
 
 	var workerCount int
 	var verbose bool
+	var retries int
+	var resultsPath string
+	var saveResults bool
 
 	rootCmd := &cobra.Command{
 		Use:   "vmu [directory]",
@@ -39,6 +43,13 @@ func main() {
 				workerCount = runtime.NumCPU()
 				log.Warn().Msgf("Worker count must be less than %d, defaulting to %d", runtime.NumCPU(), runtime.NumCPU())
 			}
+			//set sane retry attempts val
+			if retries < 0 {
+				retries = 0
+			}
+			if retries > 5 {
+				retries = 5
+			}
 
 			directory := args[0]
 
@@ -57,13 +68,18 @@ func main() {
 				os.Exit(1)
 			}
 
+			//if no location don't try to save
+			if saveResults && resultsPath == "" {
+				resultsPath = directory
+			}
+
 			log.Info().Msgf("Processing directory: %s with %d workers\n", directory, workerCount)
 
 			// Initialize processor
 			proc := processor.NewProcessor(workerCount)
 
 			// Process files
-			results, err := proc.ProcessDirectory(directory)
+			results, err := proc.ProcessDirectory(directory, retries)
 			if err != nil {
 				fmt.Printf("Error: %v\n", err)
 				os.Exit(1)
@@ -74,25 +90,28 @@ func main() {
 				len(results),
 				utils.CountSuccesses(results),
 				len(results)-utils.CountSuccesses(results))
-			for _, result := range results {
-				log.Info().Msgf("File: %s - %s\n", result.FilePath, result.Status.String())
-			}
 			counts := utils.GetStatusCounts(results)
 			utils.PrintStatusCounts(counts)
-			err = utils.SaveResults(fmt.Sprintf("%s/results.json", directory), results)
-			if err != nil {
-				log.Error().Msgf("Error saving results: %v", err)
-			}
-			err = utils.SaveFailures(fmt.Sprintf("%s/failures.json", directory), results)
-			if err != nil {
-				log.Error().Msgf("Error saving results: %v", err)
+
+			if saveResults {
+				err = utils.SaveResults(filepath.Join(resultsPath, "results.json"), results)
+				if err != nil {
+					log.Error().Msgf("Error saving results: %v", err)
+				}
+				err = utils.SaveFailures(filepath.Join(resultsPath, "failures.json"), results)
+				if err != nil {
+					log.Error().Msgf("Error saving results: %v", err)
+				}
 			}
 		},
 	}
 
 	// Define flags
-	rootCmd.Flags().IntVarP(&workerCount, "workers", "w", runtime.NumCPU(), "Number of concurrent workers")
+	rootCmd.Flags().IntVarP(&workerCount, "workers", "w", runtime.NumCPU(), "Number of concurrent workers(1-#CPUs)")
 	rootCmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "Verbose output")
+	rootCmd.Flags().IntVarP(&retries, "retries", "r", 3, "Number of retries (0-5)")
+	rootCmd.Flags().BoolVarP(&saveResults, "save", "s", false, "Save results to file - results.json/failures.json in directory. If no path is specified, results will be saved to processed directory.")
+	rootCmd.Flags().StringVarP(&resultsPath, "path", "p", "", "Path to directory to save results")
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
