@@ -17,11 +17,7 @@ LABEL description="Video Metadata Updater - Embeds metadata from NFO files into 
 LABEL version="0.7.2"
 
 # Install su-exec for safe user switching (used by entrypoint.sh)
-# Create a default non-root user and group with placeholder IDs
-# These IDs will be changed by the entrypoint.sh script at runtime
-RUN apk add --no-cache su-exec \
-    && addgroup -S appgroup \
-    && adduser -S -G appgroup appuser
+RUN apk add --no-cache su-exec
 
 # Copy application binary to standard location
 COPY --from=builder /app/vmu /usr/local/bin/vmu
