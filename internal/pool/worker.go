@@ -13,6 +13,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"os"
 	"sync"
+	"time"
 )
 
 // Worker processes jobs from the pool
@@ -125,7 +126,7 @@ func (w *Worker) processFile(filePath string) *ProcessResult {
 	}
 
 	//use media prober to access ffprobe data
-	checker := validator.NewMediaProber(30)
+	checker := validator.NewMediaProber(30 * time.Second)
 	err = checker.Probe(filePath)
 	if err != nil {
 		log.Error().Err(err).Msg("Error probing file")
