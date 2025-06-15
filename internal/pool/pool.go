@@ -44,6 +44,8 @@ func (p *Pool) Submit(filePath string) {
 	p.Jobs <- filePath
 }
 
+//TODO update to return done bool and use tracker's Result param
+
 // Wait waits for all jobs to complete and returns results
 func (p *Pool) Wait() []*tracker.ProcessResult {
 	// Use a defer to recover from panic if the channel is already closed
@@ -60,6 +62,7 @@ func (p *Pool) Wait() []*tracker.ProcessResult {
 	p.Wg.Wait() // Wait for all workers to finish
 
 	// Collect all results that are already in the channel
+	// changed way this works, but leaving in for now to avoid potential breaking changes
 	var processResults []*tracker.ProcessResult
 	// Keep reading from Results channel until it's empty
 	for {

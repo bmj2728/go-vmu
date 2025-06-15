@@ -74,6 +74,9 @@ func main() {
 				len(results),
 				countSuccesses(results),
 				len(results)-countSuccesses(results))
+			for _, result := range results {
+				log.Info().Msgf("File: %s - %s\n", result.FilePath, result.Status.String())
+			}
 		},
 	}
 

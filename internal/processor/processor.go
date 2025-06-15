@@ -42,6 +42,7 @@ func (p *Processor) ProcessDirectory(dir string) ([]*tracker.ProcessResult, erro
 	// wait for all workers to finish
 	results := p.Pool.Wait()
 	// end process directory
+	log.Debug().Msgf("Ending process directory - %v", results)
 
-	return results, nil
+	return p.ProgressTracker.Results, nil
 }

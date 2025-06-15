@@ -15,6 +15,33 @@ const (
 	StatusSkipped
 )
 
+func (ps ProcessStatus) String() string {
+	switch ps {
+	case StatusSuccess:
+		return "Success"
+	case StatusFileNotFound:
+		return "FileNotFound"
+	case StatusNFONotFound:
+		return "NFONotFound"
+	case StatusNFOParseError:
+		return "NFOParseError"
+	case StatusFFmpegError:
+		return "FFmpegError"
+	case StatusValidationError:
+		return "ValidationError"
+	case StatusCleanupError:
+		return "CleanupError"
+	case StatusNetworkError:
+		return "NetworkError"
+	case StatusUnknownError:
+		return "UnknownError"
+	case StatusSkipped:
+		return "Skipped"
+	default:
+		return "UnknownStatus"
+	}
+}
+
 // ProcessResult contains the result of processing a file
 type ProcessResult struct {
 	FilePath string
