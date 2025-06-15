@@ -135,7 +135,7 @@ func TestPool_Start(t *testing.T) {
 	// Create a pool with 2 workers
 	pool := NewPool(2)
 	pool.Jobs = make(chan string, 2)
-	pool.Results = make(chan *ProcessResult, 2)
+	pool.Results = make(chan *tracker.ProcessResult, 2)
 
 	// Create a tracker
 	tracker := tracker.NewProgressTracker(2)
@@ -152,7 +152,7 @@ func TestPool_Start(t *testing.T) {
 
 	// Wait for the result to be sent to the Results channel
 	// This is similar to how the worker test does it
-	var result *ProcessResult
+	var result *tracker.ProcessResult
 	select {
 	case result = <-pool.Results:
 		// Got a result
@@ -179,11 +179,11 @@ func TestPool_Wait(t *testing.T) {
 
 	// Create jobs and results channels
 	pool.Jobs = make(chan string, 2)
-	pool.Results = make(chan *ProcessResult, 2)
+	pool.Results = make(chan *tracker.ProcessResult, 2)
 
 	// Add some results to the channel
-	result1 := &ProcessResult{FilePath: "/path/to/file1.mkv", Success: true}
-	result2 := &ProcessResult{FilePath: "/path/to/file2.mkv", Success: false, Error: errors.New("test error")}
+	result1 := &tracker.ProcessResult{FilePath: "/path/to/file1.mkv", Success: true}
+	result2 := &tracker.ProcessResult{FilePath: "/path/to/file2.mkv", Success: false, Error: errors.New("test error")}
 
 	pool.Results <- result1
 	pool.Results <- result2

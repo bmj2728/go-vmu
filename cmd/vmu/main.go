@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/bmj2728/go-vmu/internal/logger"
-	"github.com/bmj2728/go-vmu/internal/pool"
 	"github.com/bmj2728/go-vmu/internal/processor"
+	"github.com/bmj2728/go-vmu/internal/tracker"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"os"
@@ -87,7 +87,7 @@ func main() {
 	}
 }
 
-func countSuccesses(results []*pool.ProcessResult) int {
+func countSuccesses(results []*tracker.ProcessResult) int {
 	count := 0
 	for _, r := range results {
 		if r.Success {

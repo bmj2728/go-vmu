@@ -18,7 +18,7 @@ func NewProcessor(workers int) *Processor {
 	}
 }
 
-func (p *Processor) ProcessDirectory(dir string) ([]*pool.ProcessResult, error) {
+func (p *Processor) ProcessDirectory(dir string) ([]*tracker.ProcessResult, error) {
 
 	//get jobs
 	log.Debug().Msg("Getting jobs")

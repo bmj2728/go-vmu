@@ -2,6 +2,7 @@ package tracker
 
 import (
 	"fmt"
+	//"github.com/bmj2728/go-vmu/internal/pool"
 	"github.com/schollz/progressbar/v3"
 	"path/filepath"
 	"sync"
@@ -20,6 +21,7 @@ type ProgressTracker struct {
 	totalFiles     int
 	completedFiles int
 	currentFiles   map[string]*FileProgress
+	Results        []*ProcessResult
 	mu             sync.Mutex
 	bar            *progressbar.ProgressBar
 }

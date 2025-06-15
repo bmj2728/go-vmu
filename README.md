@@ -92,7 +92,7 @@ The application will:
 2. Process files concurrently using a worker pool
 3. Display real-time progress with file names and processing stages
 4. Update each file with metadata from its corresponding NFO file
-5. Provide a summary of results upon completion
+5. Provide a summary of Results upon completion
 
 ### Future Enhancements
 

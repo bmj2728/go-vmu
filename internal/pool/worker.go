@@ -20,14 +20,14 @@ import (
 type Worker struct {
 	Id              int
 	Jobs            <-chan string
-	Results         chan<- *ProcessResult
+	Results         chan<- *tracker.ProcessResult
 	Wg              *sync.WaitGroup
 	Ctx             context.Context
 	ProgressTracker *tracker.ProgressTracker
 }
 
 // NewWorker creates a new worker
-func NewWorker(id int, jobs <-chan string, results chan<- *ProcessResult, wg *sync.WaitGroup, ctx context.Context, tracker *tracker.ProgressTracker) *Worker {
+func NewWorker(id int, jobs <-chan string, results chan<- *tracker.ProcessResult, wg *sync.WaitGroup, ctx context.Context, tracker *tracker.ProgressTracker) *Worker {
 	return &Worker{
 		Id:              id,
 		Jobs:            jobs,
@@ -51,7 +51,8 @@ func (w *Worker) Start() {
 				return
 			}
 			result := w.processFile(filePath)
-			w.Results <- result
+			w.ProgressTracker.Results = append(w.ProgressTracker.Results, result)
+			w.Results <- result //what was this channel for
 			log.Debug().Msgf("Result sent to channel. Completed files: %d", len(w.Results))
 
 		case <-w.Ctx.Done():
@@ -65,8 +66,8 @@ func (w *Worker) Start() {
 }
 
 // processFile handles the actual file processing
-func (w *Worker) processFile(filePath string) *ProcessResult {
-	result := ProcessResult{FilePath: filePath}
+func (w *Worker) processFile(filePath string) *tracker.ProcessResult {
+	result := tracker.ProcessResult{FilePath: filePath}
 	var success bool
 	var err error
 
@@ -80,7 +81,7 @@ func (w *Worker) processFile(filePath string) *ProcessResult {
 		if w.ProgressTracker != nil {
 			w.ProgressTracker.CompleteFile(filePath)
 		}
-		return result.WithResult(success, err)
+		return result.WithResult(success, err).WithStatus(tracker.StatusFileNotFound)
 	}
 
 	//get nfo file
