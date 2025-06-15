@@ -19,12 +19,15 @@ The Go Video Metadata Updater (Go-VMU) is designed to parse metadata from Jellyf
 
 ## How It Works
 
-The application follows a simple workflow:
+The application follows a comprehensive workflow:
 
 1. Parses the NFO (XML) file associated with a video file
 2. Extracts the metadata (title, plot, actors, etc.)
-3. Updates the video files using FFmpeg while preserving the original video and audio quality
-4. Validates the updated file to ensure no corruption occurred
+3. Checks if the video file already has the correct metadata to avoid unnecessary processing
+4. Updates the video files using FFmpeg while preserving the original video and audio quality
+5. Validates the updated file to ensure no corruption occurred
+6. Automatically retries failed operations to improve success rates
+7. Optionally saves detailed processing results and failures for analysis
 
 ## Current Status
 
@@ -35,6 +38,9 @@ The application follows a simple workflow:
 - Concurrent processing with worker pools
 - Real-time progress tracking
 - Logging with configurable verbosity
+- Pre-checks for matching metadata to skip already processed files
+- Automatic retries for failed operations
+- Saving processing results and failures to JSON files
 
 ### Performance Notes
 - Local file processing offers very fast speeds
@@ -75,8 +81,17 @@ vmu /path/to/your/media/library --workers 4
 # Enable verbose logging
 vmu /path/to/your/media/library --verbose
 
+# Set number of retries for failed operations (0-5, default is 3)
+vmu /path/to/your/media/library --retries 5
+
+# Save processing results and failures to JSON files in the processing directory
+vmu /path/to/your/media/library --save
+
+# Save processing results and failures to a specific directory
+vmu /path/to/your/media/library --save --path /path/to/save/results
+
 # Combine options
-vmu /path/to/your/media/library --workers 4 --verbose
+vmu /path/to/your/media/library --workers 4 --verbose --retries 5 --save
 ```
 
 You can also use shorthand forms of options
@@ -84,21 +99,28 @@ You can also use shorthand forms of options
 ```bash
 # --workers can be shortened to -w 
 # --verbose shortened to -v
-vmu /path/to/your/media/library -w 4 -v
+# --retries shortened to -r
+# --save shortened to -s
+# --path shortened to -p
+vmu /path/to/your/media/library -w 4 -v -r 5 -s
 ```
 
 The application will:
 1. Scan your media library recursively for video files
 2. Process files concurrently using a worker pool
-3. Display real-time progress with file names and processing stages
-4. Update each file with metadata from its corresponding NFO file
-5. Provide a summary of Results upon completion
+3. Check existing metadata to skip files that already have correct metadata
+4. Display real-time progress with file names and processing stages
+5. Update each file with metadata from its corresponding NFO file
+6. Automatically retry failed operations (configurable with --retries)
+7. Provide a summary of results upon completion
+8. Optionally save detailed results and failures to JSON files (with --save)
 
 ### Future Enhancements
 
 - Support for different NFO formats
-- Enhanced error recovery for file operations
 - Additional metadata customization options
+- Web interface for monitoring and management
+- Integration with media servers for automated processing
 
 ## Sample Output
 
@@ -186,9 +208,17 @@ docker run -v /path/to/your/media/library:/videos -e PUID=$(id -u) -e PGID=$(id 
 # Enable verbose logging
 docker run -v /path/to/your/media/library:/videos -e PUID=$(id -u) -e PGID=$(id -g) ghcr.io/bmj2728/go-vmu:latest /videos --verbose
 
+# Set number of retries for failed operations
+docker run -v /path/to/your/media/library:/videos -e PUID=$(id -u) -e PGID=$(id -g) ghcr.io/bmj2728/go-vmu:latest /videos --retries 5
+
+# Save processing results and failures to JSON files in the processing directory (recommended for Docker)
+docker run -v /path/to/your/media/library:/videos -e PUID=$(id -u) -e PGID=$(id -g) ghcr.io/bmj2728/go-vmu:latest /videos --save
+
 # Combine options
-docker run -v /path/to/your/media/library:/videos -e PUID=$(id -u) -e PGID=$(id -g) ghcr.io/bmj2728/go-vmu:latest /videos --workers 4 --verbose
+docker run -v /path/to/your/media/library:/videos -e PUID=$(id -u) -e PGID=$(id -g) ghcr.io/bmj2728/go-vmu:latest /videos --workers 4 --verbose --retries 5 --save
 ```
+
+> **Recommended Usage for Docker**: When using Docker, it's recommended to use the processing directory as the save directory by using the `--save` flag without specifying a path. This ensures that the results and failures are saved in the mounted volume and are accessible from the host system.
 
 ### Important Note on Permissions
 
