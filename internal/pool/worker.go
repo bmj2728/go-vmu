@@ -144,7 +144,7 @@ func (w *Worker) processFile(filePath string) *ProcessResult {
 	//create a checker and compare
 	metaChecker := metadata.NewMetaChecker(existingTags, metaMap)
 	metaMatch := metaChecker.Compare()
-	log.Info().Msgf("Metadata match: %v", metaMatch)
+	log.Debug().Msgf("Metadata match: %v", metaMatch)
 	//if we match we're done and onto the next thing
 	if metaMatch {
 		log.Debug().Msg("Existing tags match, skipping")
