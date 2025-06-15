@@ -51,8 +51,8 @@ func (w *Worker) Start() {
 				return
 			}
 			result := w.processFile(filePath)
-			w.ProgressTracker.Results = append(w.ProgressTracker.Results, result)
-			w.Results <- result //what was this channel for
+			w.ProgressTracker.AppendResult(result) // this is universally usable by the progress tracker
+			w.Results <- result                    //what was this channel for - it's local to the worker
 			log.Debug().Msgf("Result sent to channel. Completed files: %d", len(w.Results))
 
 		case <-w.Ctx.Done():
@@ -92,7 +92,7 @@ func (w *Worker) processFile(filePath string) *tracker.ProcessResult {
 		if w.ProgressTracker != nil {
 			w.ProgressTracker.CompleteFile(filePath)
 		}
-		return result.WithResult(success, err)
+		return result.WithResult(success, err).WithStatus(tracker.StatusNFONotFound)
 	}
 	if nfoPath == "" {
 		log.Error().Msg("NFO file not found")
@@ -100,7 +100,7 @@ func (w *Worker) processFile(filePath string) *tracker.ProcessResult {
 		if w.ProgressTracker != nil {
 			w.ProgressTracker.CompleteFile(filePath)
 		}
-		return result.WithResult(success, errors.New("NFO file not found"))
+		return result.WithResult(success, errors.New("NFO file not found")).WithStatus(tracker.StatusNFONotFound)
 	}
 
 	//parse nfo file
@@ -111,7 +111,7 @@ func (w *Worker) processFile(filePath string) *tracker.ProcessResult {
 		if w.ProgressTracker != nil {
 			w.ProgressTracker.CompleteFile(filePath)
 		}
-		return result.WithResult(success, err)
+		return result.WithResult(success, err).WithStatus(tracker.StatusNFOParseError)
 	}
 
 	//process into metadata
@@ -123,7 +123,7 @@ func (w *Worker) processFile(filePath string) *tracker.ProcessResult {
 		if w.ProgressTracker != nil {
 			w.ProgressTracker.CompleteFile(filePath)
 		}
-		return result.WithResult(success, err)
+		return result.WithResult(success, err).WithStatus(tracker.StatusNFOParseError)
 	}
 
 	//use media prober to access ffprobe data
@@ -153,7 +153,7 @@ func (w *Worker) processFile(filePath string) *tracker.ProcessResult {
 		if w.ProgressTracker != nil {
 			w.ProgressTracker.CompleteFile(filePath)
 		}
-		return result.WithResult(success, err)
+		return result.WithResult(success, err).WithStatus(tracker.StatusSkipped)
 	}
 
 	//create ffmpeg command
@@ -165,7 +165,7 @@ func (w *Worker) processFile(filePath string) *tracker.ProcessResult {
 		if w.ProgressTracker != nil {
 			w.ProgressTracker.CompleteFile(filePath)
 		}
-		return result.WithResult(success, err)
+		return result.WithResult(success, err).WithStatus(tracker.StatusFFmpegError)
 	}
 	cmd = cmd.GenerateArgs()
 	log.Debug().Msgf("FFmpeg command: %v", cmd)
@@ -181,7 +181,7 @@ func (w *Worker) processFile(filePath string) *tracker.ProcessResult {
 		if w.ProgressTracker != nil {
 			w.ProgressTracker.CompleteFile(filePath)
 		}
-		return result.WithResult(success, err)
+		return result.WithResult(success, err).WithStatus(tracker.StatusFFmpegError)
 	}
 
 	//validate
@@ -192,7 +192,7 @@ func (w *Worker) processFile(filePath string) *tracker.ProcessResult {
 		if w.ProgressTracker != nil {
 			w.ProgressTracker.CompleteFile(filePath)
 		}
-		return result.WithResult(success, err)
+		return result.WithResult(success, err).WithStatus(tracker.StatusValidationError)
 	}
 	if !ok {
 		log.Error().Msg("New file is invalid")
@@ -200,7 +200,7 @@ func (w *Worker) processFile(filePath string) *tracker.ProcessResult {
 		if w.ProgressTracker != nil {
 			w.ProgressTracker.CompleteFile(filePath)
 		}
-		return result.WithResult(success, err)
+		return result.WithResult(success, err).WithStatus(tracker.StatusValidationError)
 	}
 
 	//cleanup
@@ -211,7 +211,7 @@ func (w *Worker) processFile(filePath string) *tracker.ProcessResult {
 		if w.ProgressTracker != nil {
 			w.ProgressTracker.CompleteFile(filePath)
 		}
-		return result.WithResult(success, err)
+		return result.WithResult(success, err).WithStatus(tracker.StatusCleanupError)
 	}
 
 	success = true
@@ -223,5 +223,5 @@ func (w *Worker) processFile(filePath string) *tracker.ProcessResult {
 	}
 
 	//share results
-	return result.WithResult(success, err)
+	return result.WithResult(success, err).WithStatus(tracker.StatusSuccess)
 }

@@ -12,6 +12,7 @@ const (
 	StatusCleanupError
 	StatusNetworkError // For those temporary blips
 	StatusUnknownError
+	StatusSkipped
 )
 
 // ProcessResult contains the result of processing a file

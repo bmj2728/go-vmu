@@ -97,3 +97,7 @@ func (p *ProgressTracker) updateDescription() {
 
 	p.bar.Describe(desc)
 }
+
+func (p *ProgressTracker) AppendResult(result *ProcessResult) {
+	p.Results = append(p.Results, result)
+}
