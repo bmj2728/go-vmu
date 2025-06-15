@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/bmj2728/go-vmu/internal/logger"
 	"github.com/bmj2728/go-vmu/internal/processor"
-	"github.com/bmj2728/go-vmu/internal/tracker"
+	"github.com/bmj2728/go-vmu/internal/utils"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"os"
@@ -72,10 +72,20 @@ func main() {
 			// Report results
 			fmt.Printf("Processed %d files. Success: %d, Failed: %d\n",
 				len(results),
-				countSuccesses(results),
-				len(results)-countSuccesses(results))
+				utils.CountSuccesses(results),
+				len(results)-utils.CountSuccesses(results))
 			for _, result := range results {
 				log.Info().Msgf("File: %s - %s\n", result.FilePath, result.Status.String())
+			}
+			counts := utils.GetStatusCounts(results)
+			utils.PrintStatusCounts(counts)
+			err = utils.SaveResults(fmt.Sprintf("%s/results.json", directory), results)
+			if err != nil {
+				log.Error().Msgf("Error saving results: %v", err)
+			}
+			err = utils.SaveFailures(fmt.Sprintf("%s/failures.json", directory), results)
+			if err != nil {
+				log.Error().Msgf("Error saving results: %v", err)
 			}
 		},
 	}
@@ -88,14 +98,4 @@ func main() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-}
-
-func countSuccesses(results []*tracker.ProcessResult) int {
-	count := 0
-	for _, r := range results {
-		if r.Success {
-			count++
-		}
-	}
-	return count
 }

@@ -44,11 +44,19 @@ func (ps ProcessStatus) String() string {
 
 // ProcessResult contains the result of processing a file
 type ProcessResult struct {
-	FilePath string
-	Retries  int //to be used to determine if should retry this file
-	Status   ProcessStatus
-	Success  bool
-	Error    error
+	FilePath string        `json:"file_path"`
+	Retries  int           `json:"retries,omitempty"` //to be used to determine if should retry this file
+	Status   ProcessStatus `json:"status"`
+	Success  bool          `json:"success"`
+	Error    error         `json:"error,omitempty"`
+}
+
+type HumanReadableResult struct {
+	FilePath string `json:"file_path"`
+	Retries  int    `json:"retries,omitempty"`
+	Status   string `json:"status"`
+	Success  bool   `json:"success"`
+	Error    string `json:"error,omitempty"`
 }
 
 func (r *ProcessResult) WithRetries(retries int) *ProcessResult {
@@ -101,5 +109,21 @@ func (r *ProcessResult) WithError(err error) *ProcessResult {
 		Success:  r.Success,
 		Error:    err,
 		Retries:  r.Retries,
+	}
+}
+
+func (r *ProcessResult) MakeHumanReadable() *HumanReadableResult {
+	statusString := r.Status.String()
+	errorString := ""
+	if r.Error != nil {
+		errorString = r.Error.Error()
+	}
+
+	return &HumanReadableResult{
+		FilePath: r.FilePath,
+		Retries:  r.Retries,
+		Status:   statusString,
+		Success:  r.Success,
+		Error:    errorString,
 	}
 }
