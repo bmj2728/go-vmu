@@ -9,6 +9,7 @@ import (
 	"github.com/bmj2728/go-vmu/internal/nfo"
 	"github.com/bmj2728/go-vmu/internal/tracker"
 	"github.com/bmj2728/go-vmu/internal/utils"
+	"github.com/bmj2728/go-vmu/internal/validator"
 	"github.com/rs/zerolog/log"
 	"os"
 	"sync"
@@ -123,7 +124,34 @@ func (w *Worker) processFile(filePath string) *ProcessResult {
 		return result.WithResult(success, err)
 	}
 
-	//TODO add step to check metadata against extracted -- end job early if existing match
+	//use media prober to access ffprobe data
+	checker := validator.NewMediaProber(30)
+	err = checker.Probe(filePath)
+	if err != nil {
+		log.Error().Err(err).Msg("Error probing file")
+	}
+	//grab the existing tags
+	existingTags, err := checker.Tags()
+	if err != nil {
+		log.Debug().Str("prober", filePath).Msg("No existing tags found")
+	}
+	//make it easier to compare the data
+	metaMap, err := meta.ToMap()
+	if err != nil {
+		log.Error().Err(err).Msg("Error converting metadata to map")
+	}
+	//create a checker and compare
+	metaChecker := metadata.NewMetaChecker(existingTags, metaMap)
+	metaMatch := metaChecker.Compare()
+	//if we match we're done and onto the next thing
+	if metaMatch {
+		log.Debug().Msg("Existing tags match, skipping")
+		success = true
+		if w.ProgressTracker != nil {
+			w.ProgressTracker.CompleteFile(filePath)
+		}
+		return result.WithResult(success, err)
+	}
 
 	//create ffmpeg command
 	outputFile := utils.InsertTagToFileName(filePath, "govmu-edit")
