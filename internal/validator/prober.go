@@ -2,6 +2,8 @@ package validator
 
 import (
 	"context"
+	"errors"
+	"github.com/rs/zerolog/log"
 	"gopkg.in/vansante/go-ffprobe.v2"
 	"time"
 )
@@ -152,4 +154,12 @@ func (m *MediaProber) Size() string {
 		return ""
 	}
 	return m.Data.Format.Size
+}
+
+func (m *MediaProber) Tags() (ffprobe.Tags, error) {
+	if m.Data == nil || m.Data.Format.TagList == nil {
+		return nil, errors.New("No tags")
+	}
+	log.Debug().Msgf("Tags: %v", m.Data.Format.TagList)
+	return m.Data.Format.TagList, nil
 }
